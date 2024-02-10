@@ -11,15 +11,19 @@ import user from "../assets/images/image.jpg";
 import { CiHeart } from "react-icons/ci";
 import { GoComment } from "react-icons/go";
 import { RiShareForwardLine } from "react-icons/ri";
+import axios from 'axios';
 
 function Home() {
+
+const [name, setName] = useState("Barista's Café");
   const [selectedValue, setSelectedValue] = useState("");
   const [text, setText] = useState("");
   const [selectedFiles, setselectedFiles] = useState([]);
   const [imagelocale, setImageLocale] = useState();
   const [image, setImage] = useState("");
   const [videoFile, setVideoFile] = useState(null);
-
+  const [responseData, setResponseData] = useState(null);
+  const [error, setError] = useState(null);
   const handleVideoChange = (event) => {
     const selectedFiles = event.target.files;
     const filesArray = Array.from(event.target.files);
@@ -59,18 +63,34 @@ function Home() {
 
   const handleDropdownChange = (event) => {
     setSelectedValue(event.target.value);
+   
   };
 
   const handleinputchange = (event) => {
-    console.log("Event:", event);  // Log the entire event object
     const inputValue = event;
     setText(inputValue);
-    console.log("Input Value:", inputValue);
   };
 
   const handleOnEnter = (text) => {
     console.log("enter", text);
   };
+
+  const postData = async () => {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/generate-profile', {
+        content: text,
+      });
+
+       setText(response.data.data);
+      // setError(null);
+      console.log(response.data);
+    } catch (err) {
+      
+      setError(err.response.data.message); 
+      setResponseData(null);
+    }
+  };
+
 
   return (
     <div className="row">
@@ -106,15 +126,16 @@ function Home() {
                 onChange={handleinputchange}
                 height={150}
                 shouldReturnKey={true}
-                maxLength={50}
+                maxLength={100}
                 placeholder="Add tags"
               />
               <p className="description">Your text must not exceed 40 words</p>
               <div className="line"></div>
               <div className="d-flex justify-content-end">
                 <button className="cancel me-2">Cancel</button>
-                <button className="active">
+                <button className="active" onClick={postData}>
                   <BsStars />
+                  
                   Génerate
                 </button>
               </div>
@@ -139,6 +160,7 @@ function Home() {
                   id="select-image"
                   style={{ display: "none" }}
                 />
+               
                 <MdOutlineAddPhotoAlternate
                   style={{ color: "#A020F0" }}
                   className="mx-1"
@@ -237,7 +259,14 @@ function Home() {
                   </div>
                 </div>
                 <div>
+
+                  
                   <p className="description-post">{text}</p>
+                  
+
+
+
+                  
                   {videoFile && (
                     <video width="100%" height="auto" controls>
                       <source src={URL.createObjectURL(videoFile)} type={videoFile.type} />
