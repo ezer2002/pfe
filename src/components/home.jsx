@@ -297,6 +297,7 @@ const [name, setName] = useState("Barista's Café");
                     </div>
                   )}
                   {selectedFiles.map((file, index) => (
+                    
                     <div key={index} className="media-container">
                          <button className="delete-album" onClick={() => handleDeleteMedia(index)}>
                         X
