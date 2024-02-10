@@ -2,37 +2,179 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+
+
+body {
+  padding: 20px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+.cadre{
+  border: 1px solid   rgb(179, 179, 179);
+  background-color: white;
+  border-radius: 15px;
+  padding: 15px;
+}
+
+#dropdown{
+  border: 1px solid   grey;
+  background-color: white;
+  border-radius: 15px;
+  padding: 10px;
+  width: 100%;
+}
+
+.dropdown-options{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  border: 1px solid red;
+  border-top: none;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.title{
+font-weight:600;
+color: black;
+padding-bottom: 10px;
+}
+
+.description{
+  font-weight:500;
+  color: gray;
+  padding-bottom: 10px;
   }
-}
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+  .line {
+    border-top: 1px solid #ccc;
+    margin: 10px 0; /* Adjust the margin as needed */
   }
-  to {
-    transform: rotate(360deg);
+
+  .cancel{
+   background-color: white;
+   border-radius: 5px;
+   border: 1px solid grey;
+   padding-inline: 12px;
+   font-weight: 600;
+   padding-block: 4px;
   }
+
+  .active{
+    background-color: #A020F0;
+    border-radius: 5px;
+    border: 1px solid grey;
+    padding-inline: 12px;
+    font-weight: 600;
+    padding-block: 4px;
+    color: white;
+   }
+
+   .buttons{
+    background-color: whitesmoke;
+    border-radius: 5px;
+    border: 1px solid rgb(156, 156, 156);
+    padding-inline: 12px;
+    font-weight: 600;
+    padding-block: 4px;
+   }
+
+  .cadre > div > p{
+    font-weight:500;
+    color: gray;
+  }
+
+
+
+
+
+   /* Avatar.css */
+.avatar-container {
+  position: relative;
+  display: inline-block;
+}
+
+.avatar-img {
+  width: 50px; /* Adjust the size as needed */
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.online-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 1px;
+  width: 15px;
+  height: 15px;
+  background-color: rgb(66, 212, 66);
+  border-radius: 50%;
+  border: 2px solid #fff; /* Add a white border for better visibility */
+}
+
+.name-user{
+  font-weight: 600;
+  height: 9px;
+}
+
+.online-time{
+  font-weight: 300;
+  color: rgb(129, 129, 129);
+}
+
+.reaction{
+  font-weight: 500;
+  color: black;
+}
+
+.description-post{
+  padding: 10px;
+  font-weight: 500;
+  color: black;
+  position: relative;
+}
+
+.one-photo{
+  padding: 10px;
+  width: 100%;
+  position: relative;
+}
+
+.album{
+  padding: 10px;
+  width: 50%;
+  height: 250px;
+  position: relative;
+}
+
+.delete-album{
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.delete-overlay {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 5px;
+  display: none;
+}
+
+.description-post:hover .delete-overlay {
+  display: block;
+}
+
+.delete-overlay:hover {
+  color: black;
 }
