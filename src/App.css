@@ -139,19 +139,26 @@ padding-bottom: 10px;
 
 .one-photo{
   padding: 10px;
-  width: 100%;
+  /*width: 100%;*/
+  max-width: 100%;
+  height: auto;
   position: relative;
 }
 .media-container {
   position: relative;
-  display: inline-block;
+  display: block;
+  margin: 2px;
+  flex: 1;
+  overflow: hidden;
+  width: 100%; 
+  height: auto;
 }
 .album{
-  
-  padding: 10px;
-  width: 100%;
-  height: 250px;
-    display: block;
+  padding: 10px; 
+  width: 100%; 
+  /*height: 250px;*/
+  height: auto;
+  display: block;
 }
 
 .delete-album{
@@ -159,10 +166,9 @@ padding-bottom: 10px;
   top:12px; 
   right: 12px; 
   background-color: rgba(255, 255, 255, 0.8);
-
   border: none;
   border-radius: 50%; 
-display: none;
+  display: block;
   cursor: pointer;
   z-index: 1; 
 }
@@ -178,7 +184,7 @@ display: none;
   border-radius: 50%;
   cursor: pointer;
   padding: 5px;
-  display: none;
+  display: block;
 }
 
 .description-post:hover .delete-overlay {
@@ -188,3 +194,133 @@ display: none;
 .delete-overlay:hover {
   color: black;
 }
+
+.media-row {
+  display: flex;
+  justify-content: start;
+  margin-bottom: 10px; /* espace entre les lignes des images */
+  flex: 1;
+  overflow: hidden;
+}
+
+.media-container.with-overlay img {
+  /* style pour l'image avec un overlay pour montrer qu'il y a plus d'images */
+  opacity: 0.5; /* exemple pour griser l'image */
+}
+
+.media-container.overlay {
+  /* style pour le conteneur d'overlay pour afficher "+n" */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px; /* Exemple de taille de police pour le +n */
+  color: white; /* couleur du texte */
+  background-color: rgba(0, 0, 0, 0.5); /* fond semi-transparent pour le texte */
+}
+
+/* Spécificités lorsque le nombre d'images est 3 */
+.media-row.three .album {
+  height: calc(100vw / 3); /* Assure la hauteur égale si vous voulez une présentation carrée */
+}
+
+.media-row.three .media-container {
+  width: calc(50% - 4px); /* Ajuster pour l'espace de 2px de marge */
+}
+
+.media-row.three .media-container:first-child {
+  width: calc(50% - 2px); /* Ajuster pour l'espace de 2px de marge, seulement pour la première image sur la première ligne */
+}
+
+/* Spécificités lorsque le nombre d'images est 5 */
+.media-row.two, .media-row.three-and-two {
+  display: flex;
+  justify-content: space-between;
+}
+
+.media-row.two .media-container, .media-row.three-and-two .media-container:nth-last-child(-n+3) {
+  width: calc(33.333% - 4px); /* La largeur de chaque image lorsque 3 se trouvent dans une ligne */
+}
+
+.media-row.two .media-container:first-child, .media-row.three-and-two .media-container:nth-child(n+4):first-child {
+  width: calc(66.666% - 4px); /* La largeur de la première image si elle doit être double */
+}
+
+.single-row {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.full-width-row {
+  width: 100%;
+}
+
+.three-images-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.overlay {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+}
+
+/* Carousel styles */
+.carousel {
+  margin: 20px 0; /* Espace autour du carousel */
+}
+
+.carousel-item {
+  text-align: center;
+}
+
+.carousel-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px; /* Coins arrondis pour les images du carousel */
+}
+
+/* Contrôles du Carousel */
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%;
+  color: #A020F0; /* Couleur des flèches de contrôle */
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: #A020F0; /* Couleur de fond des flèches */
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  color: white; /* Couleur des flèches de contrôle au survol */
+}
+
+/* Indicateurs du Carousel (points en bas) */
+.carousel-indicators {
+  bottom: -30px; /* Position des indicateurs par rapport au bas du carousel */
+}
+
+.carousel-indicators li {
+  background-color: #A020F0; /* Couleur des points inactifs */
+}
+
+.carousel-indicators .active {
+  background-color: white; /* Couleur du point actif */
+  border: 1px solid #A020F0; /* Bordure du point actif */
+}
+
+
+
+
+
+
+
+
