@@ -147,19 +147,13 @@ padding-bottom: 10px;
 .media-container {
   position: relative;
   display: block;
-  margin: 2px;
+  /* margin: 2px; */
   flex: 1;
   overflow: hidden;
   width: 100%; 
   height: auto;
 }
-.album{
-  padding: 10px; 
-  width: 100%; 
-  /*height: 250px;*/
-  height: auto;
-  display: block;
-}
+
 
 .delete-album{
   position: absolute;
@@ -271,56 +265,50 @@ padding-bottom: 10px;
   font-size: 24px;
 }
 
-/* Carousel styles */
-.carousel {
-  margin: 20px 0; /* Espace autour du carousel */
+
+.trois{
+
+height: 206px;
+
+}
+.trois img{
+object-fit:fill;
+
+  width: 100%;
+  height: 100%;
+  }
+
+
+.tow{
+ 
+height:338px;
 }
 
-.carousel-item {
-  text-align: center;
+  .album{
+    padding: 10px; 
+   
+    /*height: 250px;*/
+
+    display: block;
+  }
+.media-container.album{
+  height:50%;
 }
+.collectimage{
+  filter: saturate(150%) brightness(50%); /* Augmente la saturation des couleurs bleues et ajuste la luminosité */
 
-.carousel-img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 10px; /* Coins arrondis pour les images du carousel */
+  position: absolute;
 }
+.numbers{display: none;}
 
-/* Contrôles du Carousel */
-.carousel-control-prev,
-.carousel-control-next {
-  width: 5%;
-  color: #A020F0; /* Couleur des flèches de contrôle */
+.play{
+  position: relative;
+  /* background-color: rgba(0, 0, 0, 0.5); */
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 44px;
+  bottom: 110px;
+  height: 100%;
 }
-
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-  background-color: #A020F0; /* Couleur de fond des flèches */
-}
-
-.carousel-control-prev:hover,
-.carousel-control-next:hover {
-  color: white; /* Couleur des flèches de contrôle au survol */
-}
-
-/* Indicateurs du Carousel (points en bas) */
-.carousel-indicators {
-  bottom: -30px; /* Position des indicateurs par rapport au bas du carousel */
-}
-
-.carousel-indicators li {
-  background-color: #A020F0; /* Couleur des points inactifs */
-}
-
-.carousel-indicators .active {
-  background-color: white; /* Couleur du point actif */
-  border: 1px solid #A020F0; /* Bordure du point actif */
-}
-
-
-
-
-
-
-
-
