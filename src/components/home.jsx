@@ -8,7 +8,7 @@ import { MdMoreTime } from "react-icons/md";
 import { IoSaveOutline } from "react-icons/io5";
 import InputEmoji from "react-input-emoji";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
-import user from "../assets/images/image.jpg";
+import user from "../assets/images/Innovation page.png";
 import { CiHeart } from "react-icons/ci";
 import { GoComment } from "react-icons/go";
 import { RiShareForwardLine } from "react-icons/ri";
@@ -18,7 +18,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Grid, Paper, Typography } from '@material-ui/core';
 
 function Home() {
-  const [name, setName] = useState("Barista's Café");
+  const [name, setName] = useState("Innovation page");
   const [selectedValue, setSelectedValue] = useState("");
   const [text, setText] = useState("");
   const [selectedFiles, setselectedFiles] = useState([]);
@@ -237,7 +237,7 @@ function Home() {
 
   const publishPost = async (e) => {
     e.preventDefault();   
-    const formData = new FormData();
+    const formData = new FormData(); 
     formData.append('message', text);
     formData.append('page_id',"115449061452354" );
      /*if (selectedFiles.length > 0) {
@@ -261,11 +261,12 @@ function Home() {
             // Vérifier si la publication a réussie
             if (response.data.message === 'Publié sur la page Facebook et enregistré dans la base de données') {
                 toast.success('Le post a été publié avec succès !', { autoClose: 5000 });
-            }/* else {
-                toast.error('Une erreur s\'est produite lors de la publication.');
+            } else {
+                //toast.error('Une erreur s\'est produite lors de la publication.');
+                toast.error(response.data.message);
             }
         } else {
-            toast.error('Réponse invalide de l\'API.');*/
+            toast.error('Réponse invalide de l\'API.');
         }
     } catch (err) {
         toast.error('Une erreur s\'est produite lors de la publication.');
@@ -292,8 +293,11 @@ function Home() {
                 >
                   <option value="">Sélectionnez un compte</option>
                   <option value="BaristasCafe">
-                  <span style={{ fontWeight: 'bold', color: '#A020F0' }}>Barista's Café</span>{" "}
-                  <span style={{ color: 'gray' }}>@Barista's Coffeeshop</span>
+                    <span style={{ fontWeight: 'bold', color: '#A020F0' }}>Barista's Café</span>{" "}
+                    <span style={{ color: 'gray' }}>@Barista's Coffeeshop</span>
+                  </option>
+                  <option value="Innovation page">
+                    <span style={{ fontWeight: 'bold', color: '#A020F0' }}>Innovation page</span>
                   </option>
                   {/* Add more options as needed */}
                 </select>
@@ -428,6 +432,7 @@ function Home() {
                   value={selectedValue}
                   onChange={handleDropdownChange}
                 >
+                  <option value="en">Innovation page</option>
                   <option value="en">Barista's Chart Default Model</option>
                   {/* Add more options as needed */}
                 </select>
@@ -435,12 +440,13 @@ function Home() {
               <div className="cadre">
                 <div className="user">
                   <div className="d-flex">
-                    <div className="avatar-container online">
-                      <img src={user} alt="User Avatar" className="avatar-img" />
+                    <div className="avatar-container online"> 
+                      <img src={user} alt="User Avatar" className="avatar-img" /> 
+
                       <div className="online-indicator"></div>
                     </div>
                     <div className="ms-2">
-                      <h6 className="name-user">Barista's Café</h6>
+                      <h6 className="name-user">Innovation page</h6>
                       <span className="online-time">A l'instant</span>
                     </div>
                   </div>
