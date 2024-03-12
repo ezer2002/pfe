@@ -90,9 +90,14 @@ function Home() {
     setSelectedValue(event.target.value);
   };
 
+  const handleCancel = () => {
+    setText(""); // Réinitialiser le contenu du champ "Add tags" à une chaîne vide
+  };
+
   const handleinputchange = (event) => {
     const inputValue = event;
     setText(inputValue);
+    //setText(event.target.value); // Mettre à jour l'état du texte lorsque l'utilisateur entre du texte
   };
 
   const handleOnEnter = (text) => {
@@ -324,7 +329,7 @@ function Home() {
                 <p className="description">Your text must not exceed 40 words</p>
                 <div className="line"></div>
                 <div className="d-flex justify-content-end">
-                  <button className="cancel me-2">Cancel</button>
+                  <button className="cancel me-2" onClick={handleCancel}>Cancel</button>
                   <button className="active" onClick={postData}>
                     <BsStars />
                     Génerate
