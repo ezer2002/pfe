@@ -1,7 +1,6 @@
-import { Calendar } from 'primereact/calendar';
 import React, { useState, useRef,useEffect } from "react";
 import { BsStars } from "react-icons/bs";
-import { BiPhotoAlbum} from "react-icons/bi";
+import { BiLock, BiPhotoAlbum} from "react-icons/bi";
 import { FiImage } from 'react-icons/fi';
 import { GoVideo } from "react-icons/go";
 import { FiSend } from "react-icons/fi";
@@ -22,10 +21,11 @@ import 'react-datetime-picker/dist/DateTimePicker.css';
 import 'react-calendar/dist/Calendar.css';
 import 'react-clock/dist/Clock.css';
 import { TiTickOutline } from "react-icons/ti";
+import dayjs from 'dayjs';
+import { AiTwotoneAudio } from "react-icons/ai";
 
 
 function Home() {
-  const [date, setDate] = useState(null);
   const [loadingPublish, setLoadingPublish] = useState(false);
   const [loadingProgram, setLoadingProgram] = useState(false);
   const [loadingDraft, setLoadingDraft] = useState(false);
@@ -48,7 +48,6 @@ function Home() {
   const [valuetime, setvaluetime] = useState(new Date());
 
   const [program, setprogram] = useState(false);
-
 
   const handleVideoChange = (event) => {
     const selectedFiles = event.target.files;
@@ -88,22 +87,18 @@ function Home() {
   
     // Si c'est une vidéo
     if (isVideo) {
-      const videoFile = files[0];
-      setVideoFile(videoFile);
-      console.log('Selected video:', videoFile);
-      return;
+      setVideoFile(null);
+      setVideoFiles(null);
     }
-  
-    // Créer un tableau de chemins de fichiers pour les images
-    const imageFiles = Array.from(files);
-    const imageFilePaths = imageFiles.map((file) => URL.createObjectURL(file));
-    setselectedFiles(imageFiles);
-  
-    // Mettre à jour l'état de la vue prévisualisation pour les images
-    // Par exemple : setImageLocale(imageFilePaths[0]);
-  };
-  
 
+     // Parcourir les fichiers pour les ajouter à selectedFiles
+     const updatedSelectedFiles = Array.from(files).map(file => ({
+      file,
+      type: file.type
+    }));
+  
+    setselectedFiles(updatedSelectedFiles);
+  };
 
   const handleFileChange = (e) => {
  
@@ -160,6 +155,7 @@ function Home() {
 
   const handleDeleteMedia = (index) => {
     const updatedFiles = [...selectedFiles];
+    //const updatedFiles = selectedFiles.filter((_, i) => i !== index);
     updatedFiles.splice(index, 1);
     setselectedFiles(updatedFiles);
     setVideoFile(null);
@@ -188,6 +184,7 @@ function Home() {
       return "three-images-row";
     return "";
   };
+
   const VoirCalendrier = () => {
     setprogram(true);
   };
@@ -198,17 +195,30 @@ function Home() {
     setColumns([col1, col2]);
   }, [selectedFiles]);
 
+ 
   const publishPost = async (e) => {
     e.preventDefault();
+    
+    /*const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
+    axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;*/
 
     const formData = new FormData();
     formData.append("message", text);
     formData.append("page_id", "115449061452354");
     formData.append("media_path", image ?? videoFile);
+    /*if (image) {
+      formData.append("media_path", image, image.name);
+    }
+    if (videoFile) {
+        formData.append("media_path", videoFile, videoFile.name);
+    }*/
 
-    selectedFiles.forEach((file, index) => {
-      formData.append(`media_paths[${index}]`, file);
+    selectedFiles.forEach((media, index) => {
+      formData.append(`media_paths[${index}]`, media.file);
     });
+    /*selectedFiles.forEach((file, index) => {
+      formData.append(`media_paths[${index}]`, file, file.name);
+    });*/
 
     ///*******+++********* */
     // const filePathsJson = '["uploads\\/post\\/17105958680.jpg","uploads\\/post\\/17105958682.jpg","uploads\\/post\\/17105958683.webp"]';
@@ -233,13 +243,16 @@ function Home() {
       setText()
       setImage(null);
       setImageLocale(null);
+      setselectedFiles([]);
   
       setColumns([]);
     } catch (err) {
+        setLoadingPublish(false);
         toast.success("Une erreur s'est produite");
         console.log(err);
     }
   };
+  
 
   const schedulePost = async (e) => {
     e.preventDefault();
@@ -248,7 +261,7 @@ function Home() {
       formData.append("message", text);
       formData.append("page_id", "115449061452354");
       formData.append("media_path", image ?? videoFile);
-      formData.append("scheduled_datetime", valuetime.toISOString());
+      formData.append("scheduled_datetime", dayjs(valuetime).format('YYYY-MM-DD HH:mm:ss'));
   
       selectedFiles.forEach((file, index) => {
         formData.append(`media_paths[${index}]`, file);
@@ -271,12 +284,15 @@ function Home() {
       setImage(null);
       setImageLocale(null);
       setvaluetime(null);
+      setprogram(false);
 
       setColumns([]);
     } catch (err) {
       toast.error("Une erreur s'est produite pendant la publication programmée");
       console.log(err);
+      setprogram(false);
     }
+    
   };
 
   const saveAsDraft = async (e) => {
@@ -347,14 +363,19 @@ function Home() {
             </p>
             <div>
               <p className="">Enter a query here</p>
-              <InputEmoji
-                value={text}
-                onChange={handleinputchange}
-                height={150}
-                shouldReturnKey={true}
-                maxLength={50}
-                placeholder="Add tags"
-              />
+              <div className="d-flex ">
+                <InputEmoji
+                  value={text}
+                  onChange={handleinputchange}
+                  height={150}
+                  shouldReturnKey={true}
+                  maxLength={50}
+                  placeholder="Add tags"
+                />
+                <div className="audio-container">
+                  <AiTwotoneAudio style={{ fontSize: "24px", color: "#333" }}/>
+                </div>
+              </div>
               <p className="description">Your text must not exceed 40 words</p>
               <div className="line"></div>
               <div className="d-flex justify-content-end">
@@ -459,42 +480,40 @@ function Home() {
                   method="post" 
                   formEncType="multipart/form-data"
                 >
-                  <div className="" > <Calendar value={date} onChange={(e) => setDate(e.value)} touchUI />
+             
+                   <div className="" > 
+                 
                     {program ? (
-                      <div className="ms-3  d-flex align-items-center ">
-                        <DateTimePicker
-                          onChange={setvaluetime}
-                          value={valuetime}
-                          className="custom-picker"
-                        />
+                      <div className='programme'>    
+                        <div className="ms-3  d-flex align-items-center ">
+                          <DateTimePicker
+                            onChange={setvaluetime}
+                            value={valuetime}
+                            className="custom-picker"
+                          />
+                        </div> 
+                        <div className='tcheck'>
+                          
+                          {
+                            loadingProgram?    <div className="loader"></div> :  
+                            
+                            <TiTickOutline style={{ color: "#A020F0" }} size={30} onClick={schedulePost}/>  
+                          }
+                        </div>
                       </div>
                     ) : (
                       <button
                         className="ms-3 buttons d-flex align-items-center"
                         onClick={VoirCalendrier}
                       >
-                      
                         <MdMoreTime style={{ color: "#A020F0" }} className="mx-1" />
-                        Choose Date
+                        program
                       </button>
-                      
                     )}
-                    <div>
-                      {loadingProgram ? (
-                        <div className="loader"></div>
-                      ) : (
-                        <button
-                          className="ms-3 buttons d-flex align-items-center"
-                          type="submit"
-                          onClick={schedulePost}
-                        >
-                          <TiTickOutline style={{ color: "#A020F0" }} />
-                          Schedule Post
-                        </button>
-                      )}
-                    </div>
+                
                   </div>
                 </form>
+
 
                 <form
                   onSubmit={saveAsDraft}
@@ -596,7 +615,7 @@ function Home() {
                       <Grid container>
                         {columns.map((column, index) => (
                           <Grid item xs={6} key={index}>
-                            {column.map((photo, indexphoto) => (
+                            {column.map((media, indexmedia) => (
                               <div
                                 key={index}
                                 className={`media-container ${getMediaClass(
@@ -611,21 +630,36 @@ function Home() {
                                   X
                                 </button>
                                 <div className={index == 1 ? "trois" : "tow"}>
-                                  <img
-                                    src={URL.createObjectURL(photo)}
-                                    alt={photo.name}
-                                    key={photo.id}
-                                    className={
-                                      indexphoto == 2
-                                        ? "album collectimage"
-                                        : "album"
-                                    }
-                                  />
+                                  {media.type.startsWith('image/') && (
+                                    <img
+                                      src={URL.createObjectURL(media.file)}
+                                      alt={media.name}
+                                      key={media.id}
+                                      className={
+                                        indexmedia == 2
+                                          ? "album collectmedia"
+                                          : "album"
+                                      }
+                                    />
+                                  )}
+                                  
+                                  {media.file.type.startsWith('video/') && (
+                                    <video controls
+                                      src={URL.createObjectURL(media.file)}
+                                      alt={media.name}
+                                      key={media.id}
+                                      className={
+                                        indexmedia == 2
+                                          ? "album collectmedia"
+                                          : "album"
+                                      }
+                                    />
+                                  )}
                                 </div>
 
                                 <span
                                   className={
-                                    indexphoto == 2 ? " play" : "numbers"
+                                    indexmedia == 2 ? " play" : "numbers"
                                   }
                                 >
                                   {" "}
@@ -637,6 +671,7 @@ function Home() {
                         ))}
                       </Grid>
                     </div>
+
                   </p>
                 </div>
               </div>
@@ -664,3 +699,55 @@ function Home() {
 }
 
 export default Home;
+
+/*<div className="media-container album">
+                      <Grid container>
+                        {columns.map((column, index) => (
+                          <Grid item xs={6} key={index}>
+                            {column.map((file, fileIndex) => {
+                              const fileKey = `file-${index}-${fileIndex}`;
+                              const isVideo = file.type.startsWith('video/');
+
+                              return (
+                                <div 
+                                  key={fileKey}
+                                  className={`media-container ${getMediaClass(
+                                    fileIndex,
+                                    selectedFiles.length
+                                  )}`}
+                                >
+                                  
+                                  <button
+                                    className="delete-album"
+                                    onClick={() => handleDeleteMedia(fileIndex)}
+                                  >
+                                   X
+                                  </button>
+                                  <div className={index == 1 ? "trois" : "tow"}>
+                                  {isVideo ? (
+                                    <video width="320" height="240" controls>
+                                      <source src={URL.createObjectURL(file)} type={file.type} />
+                                      Your browser does not support the video tag.
+                                    </video>
+                                  ) : (
+                                    <img src={URL.createObjectURL(file)} alt={`file-${fileIndex}`} />
+                                  )}
+                                </div>
+
+                                <span
+                                  className={
+                                    indexphoto == 2 ? " play" : "numbers"
+                                  }
+                                >
+                                  {" "}
+                                  {selectedFiles.length - 4}+{" "}
+                                </span>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </Grid>
+                        ))}
+                      </Grid>
+</div>
+*/

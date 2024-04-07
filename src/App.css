@@ -294,7 +294,7 @@ height:338px;
 .media-container.album{
   height:50%;
 }
-.collectimage{
+.collectmedia{
   filter: saturate(150%) brightness(50%); /* Augmente la saturation des couleurs bleues et ajuste la luminosité */
 
   position: absolute;
@@ -346,3 +346,35 @@ height:338px;
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.tcheck{
+  background-color: white;
+  text-align: center;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.programme{
+  display: flex;
+}
+
+.audio-container {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  border: none;
+  cursor: pointer;
+  justify-content: center;
+  width: 35px;
+}
+
+.audio-container:hover {
+  background-color: #e5e5e5;
+}
+
+.audio-container svg {
+  fill: #333;
+}
+
