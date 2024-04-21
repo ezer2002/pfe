@@ -23,12 +23,16 @@ import 'react-clock/dist/Clock.css';
 import { TiTickOutline } from "react-icons/ti";
 import dayjs from 'dayjs';
 import { AiTwotoneAudio } from "react-icons/ai";
-
+import { useReactMediaRecorder } from "react-media-recorder";
+import { FaRegStopCircle } from "react-icons/fa";
+import { MdCancel } from "react-icons/md";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 function Home() {
   const [loadingPublish, setLoadingPublish] = useState(false);
   const [loadingProgram, setLoadingProgram] = useState(false);
   const [loadingDraft, setLoadingDraft] = useState(false);
+  const [loadingGenerate, setLoadingGenerate] = useState(false);
 
   const [selectedValue, setSelectedValue] = useState("");
   const [text, setText] = useState("");
@@ -48,6 +52,59 @@ function Home() {
   const [valuetime, setvaluetime] = useState(new Date());
 
   const [program, setprogram] = useState(false);
+
+  //audio
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const [second, setSecond] = useState("00");
+  const [minute, setMinute] = useState("00");
+  const [isActive, setIsActive] = useState(false);
+  const [counter, setCounter] = useState(0);
+
+  useEffect(() => {
+    let intervalId;
+
+    if (isActive) {
+      intervalId = setInterval(() => {
+        const secondCounter = counter % 60;
+        const minuteCounter = Math.floor(counter / 60);
+
+        let computedSecond =
+          String(secondCounter).length === 1
+            ? `0${secondCounter}`
+            : secondCounter;
+        let computedMinute =
+          String(minuteCounter).length === 1
+            ? `0${minuteCounter}`
+            : minuteCounter;
+
+        setSecond(computedSecond);
+        setMinute(computedMinute);
+
+        setCounter((counter) => counter + 1);
+      }, 1000);
+    }
+
+    return () => clearInterval(intervalId);
+  }, [isActive, counter]);
+  function stopTimer() {
+    setIsActive(false);
+    setCounter(0);
+    setSecond("00");
+    setMinute("00");
+  }
+  const {
+    status,
+    startRecording,
+    stopRecording,
+    pauseRecording,
+    mediaBlobUrl
+  } = useReactMediaRecorder({
+    video: false,
+    audio: true,
+    echoCancellation: true
+  });
 
   const handleVideoChange = (event) => {
     const selectedFiles = event.target.files;
@@ -133,15 +190,17 @@ function Home() {
 
   const Generer = async () => {
     try {
+      setLoadingGenerate(true);
       const response = await axios.post(
         "http://127.0.0.1:8000/api/generate-profile",
         {
           content: text,
         }
       );
-
+      setLoadingGenerate(false);
       setText(response.data.data);
     } catch (err) {
+      setLoadingGenerate(false);
       setError(err.response.data.message);
       setResponseData(null);
     }
@@ -319,16 +378,63 @@ function Home() {
       setText()
       setImage(null);
       setImageLocale(null);
-
-    
       setColumns([]);
     } catch (err) {
       toast.error('Une erreur s\'est produite lors de la sauvegarde en tant que brouillon');
       console.log(err);
-    }
-    
+    }  
   };
 
+  /*const handleVoiceToText = () => {
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.interimResults = true;
+  
+    recognition.addEventListener('result', (e) => {
+      const transcript = Array.from(e.results)
+        .map((result) => result[0])
+        .map((result) => result.transcript)
+        .join('');
+  
+      setText(transcript);
+    });
+  
+    recognition.start();
+  };*/
+
+  const recognition = new window.webkitSpeechRecognition();
+
+  const handleVoiceToText = () => {
+    recognition.interimResults = true;
+    recognition.continuous = true; // Continue à écouter même après des pauses courtes
+  
+      
+    recognition.onresult = (e) => {
+      let transcript = '';
+      for (const result of e.results) {
+        transcript += result[0].transcript;
+      }
+      setText(transcript);
+    };
+  
+    recognition.onend = () => {
+      // Optionnel: redémarrer la reconnaissance si nécessaire
+      if (!recognition.aborted) {
+        recognition.start();
+      } 
+    };
+  
+    recognition.onerror = (event) => {
+      // Gérez ici les erreurs.
+      console.error("Erreur de reconnaissance vocale: ", event.error);
+    };
+    
+    recognition.start(); 
+    // 
+
+  };
+  const stopTranscription = () => {
+    recognition.abort(); 
+  }
   return (
     <div className="row">
       <div className="col-md-6">
@@ -372,18 +478,70 @@ function Home() {
                   maxLength={50}
                   placeholder="Add tags"
                 />
-                <div className="audio-container">
-                  <AiTwotoneAudio style={{ fontSize: "24px", color: "#333" }}/>
-                </div>
-              </div>
-              <p className="description">Your text must not exceed 40 words</p>
+                  <div>  
+                      <div>
+                        <div style={{
+                          display:"flex",
+                          paddingTop:"15px"
+                        }}>
+                    
+                          <button
+                            style={{
+                              border: "none",
+                              fontSize: "1.3rem",
+                              cursor: "pointer",
+                              color: "black",
+                           }}
+                           onClick={() => {
+                              if (!isActive) {
+                                startRecording();
+                              } else {
+                                pauseRecording();
+                              }
+                              setIsActive(!isActive);
+                            }}
+                          >
+                            
+                            {isActive ? (
+                              <FaRegStopCircle onClick={stopTranscription}  />  
+                            ) : (
+                              <AiTwotoneAudio onClick={handleVoiceToText} />
+                            )}
+                          </button>
+                          
+                          
+                        </div>
+                        
+                        <div style={{ fontSize: "14px" }}>
+                          <span className="minute">{minute}</span>
+                          <span>:</span>
+                          <span className="second">{second}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="description">Your text must not exceed 40 words</p>
+                  
               <div className="line"></div>
+              
               <div className="d-flex justify-content-end">
-                <button className="cancel me-2" onClick={handleCancel}>Cancel</button>
-                <button className="active" onClick={Generer}>
-                  <BsStars />
-                  Génerate
+                <button 
+                  className="cancel me-2" 
+                  onClick={handleCancel}
+                >
+                  Cancel
                 </button>
+                {loadingGenerate  ? (
+                  <div class="loader"></div>
+                ) : (
+                  <button
+                    className="active" 
+                    onClick={Generer}
+                  >
+                    <BsStars />
+                    Génerate
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -700,54 +858,3 @@ function Home() {
 
 export default Home;
 
-/*<div className="media-container album">
-                      <Grid container>
-                        {columns.map((column, index) => (
-                          <Grid item xs={6} key={index}>
-                            {column.map((file, fileIndex) => {
-                              const fileKey = `file-${index}-${fileIndex}`;
-                              const isVideo = file.type.startsWith('video/');
-
-                              return (
-                                <div 
-                                  key={fileKey}
-                                  className={`media-container ${getMediaClass(
-                                    fileIndex,
-                                    selectedFiles.length
-                                  )}`}
-                                >
-                                  
-                                  <button
-                                    className="delete-album"
-                                    onClick={() => handleDeleteMedia(fileIndex)}
-                                  >
-                                   X
-                                  </button>
-                                  <div className={index == 1 ? "trois" : "tow"}>
-                                  {isVideo ? (
-                                    <video width="320" height="240" controls>
-                                      <source src={URL.createObjectURL(file)} type={file.type} />
-                                      Your browser does not support the video tag.
-                                    </video>
-                                  ) : (
-                                    <img src={URL.createObjectURL(file)} alt={`file-${fileIndex}`} />
-                                  )}
-                                </div>
-
-                                <span
-                                  className={
-                                    indexphoto == 2 ? " play" : "numbers"
-                                  }
-                                >
-                                  {" "}
-                                  {selectedFiles.length - 4}+{" "}
-                                </span>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </Grid>
-                        ))}
-                      </Grid>
-</div>
-*/

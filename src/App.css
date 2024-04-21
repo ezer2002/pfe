@@ -378,3 +378,193 @@ height:338px;
   fill: #333;
 }
 
+
+
+span{
+  font-size: 15px;
+}
+
+  .rbc-header {
+    color: black;
+    font-size: 14px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px !important;
+    background: rgba(255, 255, 255, 0.712);
+  }
+  
+  .rbc-allday-cell {
+    display: none;
+  }
+  .rbc-event-content{
+    color: black;
+  }
+
+  .rbc-time-header-cell .rbc-today {
+    background-color: rgb(103, 103, 245) !important;
+    color: #ffffff;
+  }
+  
+  .rbc-time-slot {
+    color: #74a4c3;
+    z-index: 1;
+    
+  }
+  
+  .rbc-time-slot:not(.rbc-today .rbc-time-slot) {
+    background-color: #eff4f7;
+  }
+  
+
+ 
+  .rbc-events-container {
+    width: 100% !important;
+  }
+  
+  /*Timeslots Customization*/
+  .rbc-day-slot .rbc-time-slot:after {
+    content: "";
+    width: 100%;
+    border-top: 1px solid #fbb3ec;
+    display: block;
+    
+  }
+  /* .rbc-toolbar button:active, .rbc-toolbar button.rbc-active {
+    background-image: none;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    background-color: yellow;
+   
+  } */
+  .rbc-toolbar {
+    font-size: 15px;
+  }
+  .rbc-btn-group button + button {
+   color:black;    font-size: 15px;
+  }
+  .rbc-btn-group button  {   
+     font-size: 15px;
+
+    color:turquoise;
+   }
+  
+  .rbc-btn-group button + button:hover{
+
+    color:black;
+   }
+  
+   .rbc-btn-group > button:first-child:not(:last-child) {
+
+
+    color: black;
+    background-color: white;
+    margin: 5px;
+    
+  }
+  .event-sub-title{
+    font-weight: 700;
+  }
+  
+  .event-title{
+    color: rgb(165, 165, 165);
+    font-weight: 300;
+    font-size: 15px;
+  }
+  .container-row{
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .add-new{
+    border: 1px solid white;
+    padding: 5px;
+    font-size: 15px;
+    color: white;
+    background-color: blue;
+  }
+
+  
+
+/* Popup styles */
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width:50%;
+  max-height: 80%;
+  overflow-y: auto;
+  background-color: rgba(255, 255, 255, 0.9); 
+  padding: 20px;
+  border-radius: 30px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  animation: fadeInOut 1s ease forwards;
+  z-index: 1000;
+}
+@media screen and (max-width: 768px) {
+  .popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    background-color: rgba(255, 255, 255, 0.9); 
+    padding: 20px;
+    border-radius: 30px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+    animation: fadeInOut 1s ease forwards;
+    z-index: 1000;
+  }
+}
+
+.popup-content {
+  
+  padding: 20px;
+  position: relative;
+}
+.popup-content .close{
+position: absolute;
+top: 0;
+right: 15px;
+position: fixed;
+cursor: pointer;
+}
+
+.popup p {
+  margin: 20px;
+
+  font-size: 16px; 
+  color: #555;
+
+ 
+}
+
+.popup .close-button {
+  position: absolute;
+  margin: 5px;
+  top: 2px;
+right: 1px; /* Adjust right position */
+  font-size: 20px; /* Adjust font size */
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0; /* Remove padding */
+  line-height: 1; /* Reduce line height */
+  height: 20px; /* Adjust button height */
+  width: 20px; /* Adjust button width */
+}
+
+.popup .close-button:hover {
+    color: red;
+}.event-icon::before {
+  content: '\f007'; /* Add the Unicode for your desired icon */
+  position: absolute;
+  left: -20px; /* Adjust the position of the icon as needed */
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Font Awesome'; /* Assuming you are using Font Awesome for icons */
+  font-size: 14px; /* Adjust the size of the icon as needed */
+}
