@@ -27,6 +27,8 @@ import { useReactMediaRecorder } from "react-media-recorder";
 import { FaRegStopCircle } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { useParams } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 function Home() {
   const [loadingPublish, setLoadingPublish] = useState(false);
@@ -62,6 +64,9 @@ function Home() {
   const [isActive, setIsActive] = useState(false);
   const [counter, setCounter] = useState(0);
 
+  //eventId
+  const { eventId } = useParams();
+  
   useEffect(() => {
     let intervalId;
 
@@ -132,7 +137,7 @@ function Home() {
   
     if (!isImage && !isVideo) {
       // Utilisation de toast pour afficher un message d'erreur
-      toast.error('Veuillez choisir une image ou une vidéo.');
+      toast.error('Please choose an image or a video.');
       return;
     }
   
@@ -298,7 +303,7 @@ function Home() {
         }
       );
       setLoadingPublish(false);
-      toast.success("Post publié avec succès");
+      toast.success("Post published successfully.");
       setText()
       setImage(null);
       setImageLocale(null);
@@ -307,7 +312,7 @@ function Home() {
       setColumns([]);
     } catch (err) {
         setLoadingPublish(false);
-        toast.success("Une erreur s'est produite");
+        toast.success("An error occurred.");
         console.log(err);
     }
   };
@@ -338,7 +343,7 @@ function Home() {
         }
       );
       setLoadingProgram(false); 
-      toast.success("Publication programmée avec succès");
+      toast.success("Publication scheduled successfully.");
       setText()
       setImage(null);
       setImageLocale(null);
@@ -347,7 +352,7 @@ function Home() {
 
       setColumns([]);
     } catch (err) {
-      toast.error("Une erreur s'est produite pendant la publication programmée");
+      toast.error("The publication date must be between 10 minutes and 30 days after the current date.");
       console.log(err);
       setprogram(false);
     }
@@ -374,35 +379,28 @@ function Home() {
         },
       });
       setLoadingDraft(false);
-      toast.success('Post sauvegardé en tant que brouillon');
+      toast.success('Post saved as draft.');
       setText()
       setImage(null);
       setImageLocale(null);
       setColumns([]);
     } catch (err) {
-      toast.error('Une erreur s\'est produite lors de la sauvegarde en tant que brouillon');
+      toast.error('An error occurred while saving as draft.');
       console.log(err);
     }  
   };
 
-  /*const handleVoiceToText = () => {
-    const recognition = new window.webkitSpeechRecognition();
-    recognition.interimResults = true;
-  
-    recognition.addEventListener('result', (e) => {
-      const transcript = Array.from(e.results)
-        .map((result) => result[0])
-        .map((result) => result.transcript)
-        .join('');
-  
-      setText(transcript);
-    });
-  
-    recognition.start();
-  };*/
+  const toggleRecording = () => {
+    if (!isActive) {
+      startRecording();
+    } else {
+      pauseRecording();
+    }
+    setIsActive(!isActive);
+  };
 
   const recognition = new window.webkitSpeechRecognition();
-
+  
   const handleVoiceToText = () => {
     recognition.interimResults = true;
     recognition.continuous = true; // Continue à écouter même après des pauses courtes
@@ -425,16 +423,28 @@ function Home() {
   
     recognition.onerror = (event) => {
       // Gérez ici les erreurs.
-      console.error("Erreur de reconnaissance vocale: ", event.error);
+      console.error("Voice recognition error. ", event.error);
     };
     
-    recognition.start(); 
+    if (!isRecording) {
+      // Commencer l'enregistrement vocal
+      recognition.start();
+      setIsRecording(true);
+    }
     // 
 
   };
+
   const stopTranscription = () => {
-    recognition.abort(); 
+    if (isRecording) {
+      // Arrêter l'enregistrement vocal
+      recognition.abort();
+      setIsRecording(false);
+    }
   }
+
+  
+
   return (
     <div className="row">
       <div className="col-md-6">
@@ -492,14 +502,7 @@ function Home() {
                               cursor: "pointer",
                               color: "black",
                            }}
-                           onClick={() => {
-                              if (!isActive) {
-                                startRecording();
-                              } else {
-                                pauseRecording();
-                              }
-                              setIsActive(!isActive);
-                            }}
+                           onClick={toggleRecording}
                           >
                             
                             {isActive ? (

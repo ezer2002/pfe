@@ -568,3 +568,7 @@ right: 1px; /* Adjust right position */
   font-family: 'Font Awesome'; /* Assuming you are using Font Awesome for icons */
   font-size: 14px; /* Adjust the size of the icon as needed */
 }
+
+.audio-container.active {
+  background-color: #2196F3; /* Bleu pour indiquer l'enregistrement actif */
+}

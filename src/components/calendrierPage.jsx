@@ -25,15 +25,16 @@ const localizer = momentLocalizer(moment);
       </div>
     </div>
 );*/
-const EventComponent = ({ event }) => (
-<div >
-      <div className="event-title">{event.title}</div>
-      <div className="event-sub-title">
+const EventComponent = ({ event, onEventClick }) => (
+  <div>
+    <div className="event-title">{event.title}</div>
+    <div className="event-sub-title">
       {event.subtitle} sdfsdfsdf<FaFileImage color={event.color} />
-      {event.subtitle === 'Programmée' && <FaFileImage color={event.color} />}  {/* Icône pour événement programmé */}
-      {event.subtitle === 'Meta Business Suite' && <FaSquareFacebook color={event.color} />}  {/* Icône pour Meta Business Suite */}
-      {event.subtitle === 'Meta Business Suite_Programmer' && <IoLogoLinkedin color={event.color} />}  {/* Icône pour Meta Business Suite Programmer */}
-      </div>
+      {event.subtitle === 'Programmée' && <FaFileImage color={event.color} />}
+      {event.subtitle === 'Meta Business Suite' && <FaSquareFacebook color={event.color} />}
+      {event.subtitle === 'Meta Business Suite_Programmer' && <IoLogoLinkedin color={event.color} />}
+    </div>
+    <button onClick={() => onEventClick(event.id)}>Voir plus</button>
   </div>
 );
 
@@ -55,11 +56,14 @@ const MoreEventsPopup = ({ events }) => {
 
 
 export default function Calenderpage() {
+  const [showpopup, setshowpopup] = useState(false);
+  const [eventsDays, seteventsDays] = useState();
+  const navigate = useNavigate();
 
+const handleEventClick = (eventId) => {
+  navigate(`/post/${eventId}`);// Navigation vers la page du post avec l'ID de l'événement
+};
 
-  const [showpopup, setshowpopup]=useState(false)
-
-const [eventsDays, seteventsDays]=useState()
 const togglePopup =()=>{
   setshowpopup(!showpopup)
 }
@@ -100,14 +104,13 @@ const handleClick=(events)=>{
   const [showMorePopup, setShowMorePopup] = useState(false);
   const [moreEvents, setMoreEvents] = useState([]);
 
-  // Initialize the useNavigate hook
-  const navigate = useNavigate();
+  
 
   // Function to handle navigation to the Home component
   const navigateToHome = () => {
     navigate('/home'); 
   };
-  const CustomDayEvent = ({ events }) => (
+ const CustomDayEvent = ({ events }) => (
     <div>
       {events.map(event => (
         <div key={event.id}>
@@ -119,7 +122,7 @@ const handleClick=(events)=>{
   
   const CustomDateCellWrapper = ({ children, value, events }) => {
     const [showAllEvents, setShowAllEvents] = useState(false);
-  
+   
     const toggleShowAllEvents = () => {
       setShowAllEvents(!showAllEvents);
     };
@@ -212,42 +215,41 @@ const handleClick=(events)=>{
             </div>
 
              
-<Calendar
-  localizer={localizer}
-  startAccessor="start"
-  events={events}
-  endAccessor="end"
-  style={{
-    height: '500px',
-    border: '1px solid #ccc',
-    borderRadius: '5px',
-    padding: '15px',
-  }}
-  eventPropGetter={(event) => ({
-    style: {
-      borderRadius: '0',
-      backgroundColor: '#f8f9fa',
-      borderLeft: `3px solid ${event.color}`,
-      color: '#fff',    
+            <Calendar
+            
+              localizer={localizer}
+              startAccessor="start"
+              events={events}
+              endAccessor="end"
+              style={{
+                height: '500px',
+                border: '1px solid #ccc',
+                borderRadius: '5px',
+                padding: '15px',
+              }}
+              eventPropGetter={(event) => ({
+                style: {
+                  borderRadius: '0',
+                  backgroundColor: '#f8f9fa',
+                  borderLeft: `3px solid ${event.color}`,
+                  color: '#fff',    
 
-    },
-  })}
+                },
+              })}
 
-  views={[Views.MONTH, Views.WEEK]}
-  components={{
-    events:EventComponent,
-    day: {
-      event: ({ event }) => <EventComponent events={[event]} />, // Pass events prop to CustomDayEvent
-    },
-   // Utilisez le composant personnalisé pour le rendu des cases de calendrier
-  
-  }}
-  popup={false}
-      onShowMore={(events, date) =>handleClick(events)}
- 
-  onSelectSlot={handleSelectSlot}
-onSelecting={handleClick}
-/>
+              views={[Views.MONTH, Views.WEEK]}
+              components={{
+                events: ({ event }) => <EventComponent event={event} onEventClick={handleEventClick} />,
+                day: {
+                  event: ({ event }) => <EventComponent event={event} onEventClick={handleEventClick} />,
+                },
+              }}
+              popup={false}
+                  onShowMore={(events, date) =>handleClick(events)}
+            
+              onSelectSlot={handleSelectSlot}
+            onSelecting={handleClick}
+            />
           </div>
           {showpopup && (
         <div className="popup">
@@ -255,30 +257,33 @@ onSelecting={handleClick}
             <button className="close-button" onClick={togglePopup}>×</button>
           
                <div>
-    {eventsDays.map(item => (
-      <div key={item.id} style={{
-    border: `2px solid ${item.color}`,
-    borderRadius: '5px',
-    padding: '10px',
-    marginBottom: '10px',
-  }}>
-        <h3 className="event-title">{item.title}</h3>
-  
+                
+                  {eventsDays.map(item => (
+                    <div key={item.id} style={{
+                      border: `2px solid ${item.color}`,
+                      borderRadius: '5px',
+                      padding: '10px',
+                      marginBottom: '10px',
+                    }}>
+                      <button onClick={() => handleEventClick(item.id)}></button>
+                      <h3 className="event-title">{item.title}</h3>
+                
 
 
-      <div className="event-sub-title">
-<span className="p-1">  {new Date(item.start).getHours()}:{new Date(item.start).getMinutes()}:{new Date(item.start).getSeconds()} </span>
-    
-      
-      <FaFileImage color={item.color} />
-      <p></p>
+                    <div className="event-sub-title">
+                      <span className="p-1">  {new Date(item.start).getHours()}:{new Date(item.start).getMinutes()}:{new Date(item.start).getSeconds()} </span>
+                      
+                        
+                        <FaFileImage color={item.color} />
+                        <p></p>
 
-      {item.subtitle === 'Programmée' && <FaFileImage color={item.color} />}  {/* Icône pour événement programmé */}
-      {item.subtitle === 'Meta Business Suite' && <FaSquareFacebook color={item.color} />}  {/* Icône pour Meta Business Suite */}
-      {item.subtitle === 'Meta Business Suite_Programmer' && <IoLogoLinkedin color={item.color} />}  {/* Icône pour Meta Business Suite Programmer */}
-      </div>  </div>
-    ))}
-  </div>  
+                        {item.subtitle === 'Programmée' && <FaFileImage color={item.color} />}  {/* Icône pour événement programmé */}
+                        {item.subtitle === 'Meta Business Suite' && <FaSquareFacebook color={item.color} />}  {/* Icône pour Meta Business Suite */}
+                        {item.subtitle === 'Meta Business Suite_Programmer' && <IoLogoLinkedin color={item.color} />}  {/* Icône pour Meta Business Suite Programmer */}
+                    </div>  
+                  </div>
+                ))}
+              </div>  
             
             
 
