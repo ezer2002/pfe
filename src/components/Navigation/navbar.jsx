@@ -5,7 +5,7 @@ import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { IoSearch } from "react-icons/io5";
 import profil from "../../assets/images/Innovation page.png";
 import profil2 from "../../assets/images/Innovation page.png";
-import "./navbar.css"
+import "../../styles/navbar.css"
 
 function Navbar() {
     const [Mobile, setMobile] = useState(false);

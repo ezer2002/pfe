@@ -4,18 +4,31 @@ import Home from './components/home';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Calenderpage from './components/calendrierPage';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import Register from './components/Register';
+
 
 function App() {
   return (   
   //<Home/> 
-  //<Calenderpage/>
-  <Router>
+
+  /*<Router>
     <Routes>
-      <Route exact path="/home" element={<Home/>}/>
-      <Route exact path="/calendar" element={<Calenderpage/>}/>
-      <Route exact path="/post/:eventId" element={<Home />}/>
+      <Route exact path="/" element={<Home />} />
+      <Route exact path="/post/:eventId" element={<Home />} />
+      <Route exact path="/calendar" element={<Calenderpage />} />
     </Routes>
-  </Router>
+  </Router>*/
+  <>
+    
+      <Routes>
+        <Route path="/login" element={<Login/>} />
+        <Route path="/register" element={<Register/>} />
+        <Route path="/calendar" element={<Calenderpage/>} />
+        <Route path="/" element={<Home />} />
+
+      </Routes>
+  </>
   );
 }
 

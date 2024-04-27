@@ -488,7 +488,7 @@ function Home() {
                   maxLength={50}
                   placeholder="Add tags"
                 />
-                  <div>  
+                  <div >  
                       <div>
                         <div style={{
                           display:"flex",

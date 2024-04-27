@@ -5,7 +5,7 @@ import { BsInstagram } from "react-icons/bs";
 import { IoLogoLinkedin } from "react-icons/io5";
 import logo from "../../assets/images/Innovation page.png";
 import { SlCalender } from "react-icons/sl";
-import "./sidebar.css"
+import "../../styles/sidebar.css"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 

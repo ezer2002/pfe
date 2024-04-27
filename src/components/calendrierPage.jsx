@@ -108,7 +108,7 @@ const handleClick=(events)=>{
 
   // Function to handle navigation to the Home component
   const navigateToHome = () => {
-    navigate('/home'); 
+    navigate('/'); 
   };
  const CustomDayEvent = ({ events }) => (
     <div>
