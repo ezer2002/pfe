@@ -1,8 +1,53 @@
-import React from 'react'
+import React, { useState } from 'react'
 import '../styles/login.css'
 import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { connect, useDispatch, useSelector } from "react-redux";
+import * as actionTypes from '../reducers/actionTypes'
 const Login = () => {
   const navigate=useNavigate()
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+
+
+
+  const login = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("password", password);
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/login",
+        formData, // Ajoutez les données à envoyer
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      dispatch({
+        type: actionTypes.LOGIN_SUCCESS,
+        user: formData
+      });
+      navigate('/calendar')
+
+      console.log("response", response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+
+
+
+
+
+
   return (
     <div className="login">
     <div className="login-container">
@@ -23,12 +68,20 @@ const Login = () => {
                 </div>
               
                 <div className="login-input">
-                    <label name="email">Email profetionnel</label>
-                    <input type="text" placeholder='Nom@email.com' />
+                    <label name="email">Email professionnel</label>
+                    <input type="text"
+                    
+                    onChange={(event) => setEmail(event.target.value)}
+
+                    placeholder='Nom@email.com' />
                 </div>
                 <div className="login-input">
                     <label name="password">Mot de passe</label>
-                    <input type="password" />
+                    <input type="password" 
+                    
+                    onChange={(event) => setPassword(event.target.value)}
+
+                    />
                   
                 </div>
             <div className="save-password">
@@ -39,7 +92,7 @@ const Login = () => {
             <p>Mot de passe oublié?</p>
             </div>
             <div className="login-button">
-                <button>Se connecter</button>
+                <button onClick={login}>Se connecter</button>
             </div>
             <div className="move-to-register">
             <h5>Vous avez déja un compte ?</h5>

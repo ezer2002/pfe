@@ -113,5 +113,13 @@
       padding: 5px;
       color: grey;
     }
-  
-  
+  .dropdown-menu{
+    margin-right: 5px;
+
+  }
+  .dropdown-user{
+    display: flex;
+  }
+  .dropdown-menu{
+    margin-top: 2px;
+  }

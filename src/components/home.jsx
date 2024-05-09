@@ -29,20 +29,29 @@ import { MdCancel } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useParams } from 'react-router-dom';
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 function Home() {
+  const location = useLocation();
+  const params = new URLSearchParams(window.location.search);
+  const encodedData = params.get("data");
+
+  const { eventdata } = useParams();
+  const data =eventdata? JSON.parse(eventdata):null;
+
   const [loadingPublish, setLoadingPublish] = useState(false);
   const [loadingProgram, setLoadingProgram] = useState(false);
   const [loadingDraft, setLoadingDraft] = useState(false);
   const [loadingGenerate, setLoadingGenerate] = useState(false);
 
   const [selectedValue, setSelectedValue] = useState("");
-  const [text, setText] = useState("");
+  const [text, setText] = useState(data ? data.message : "");
   const [selectedFiles, setselectedFiles] = useState([]);
   const [columns, setColumns] = useState([]);
 
-  const [imagelocale, setImageLocale] = useState();
-  const [image, setImage] = useState("");
+  const [imagelocale, setImageLocale] = useState(
+    data ?`http://127.0.0.1:8000/${data.media_path}`:""
+  );  const [image, setImage] = useState("");
   const [videoFile, setVideoFile] = useState(null);
   const [videoFiles, setVideoFiles] = useState([]);
   const [responseData, setResponseData] = useState(null);
@@ -327,8 +336,8 @@ function Home() {
       formData.append("media_path", image ?? videoFile);
       formData.append("scheduled_datetime", dayjs(valuetime).format('YYYY-MM-DD HH:mm:ss'));
   
-      selectedFiles.forEach((file, index) => {
-        formData.append(`media_paths[${index}]`, file);
+      selectedFiles.forEach((media, index) => {
+        formData.append(`media_paths[${index}]`, media.file);
       });
   
     try {
@@ -368,8 +377,8 @@ function Home() {
       formData.append('page_id', '115449061452354');
       formData.append('media_path', image ?? videoFile);
   
-      selectedFiles.forEach((file, index) => {
-        formData.append(`media_paths[${index}]`, file);
+      selectedFiles.forEach((media, index) => {
+        formData.append(`media_paths[${index}]`, media.file);
       });
     try {
       setLoadingDraft(true);
@@ -457,7 +466,7 @@ function Home() {
                   value={selectedValue}
                   onChange={handleDropdownChange}
                 >
-                  <option value="">Sélectionnez un compte</option>
+                  <option value="">Select an account</option>
                   <option value="BaristasCafe">
                     <span style={{ fontWeight: 'bold', color: '#A020F0' }}>Barista's Café</span>{" "}
                     <span style={{ color: 'gray' }}>@Barista's Coffeeshop</span>
@@ -550,7 +559,7 @@ function Home() {
           </div>
         </div>
         
-          <div className="mb-3">
+        <div className="mb-3">
             <div className="cadre">
               <h6 className="title">Multimedia content</h6>
               <p className="description">
@@ -860,4 +869,6 @@ function Home() {
 }
 
 export default Home;
+
+
 

@@ -3,9 +3,10 @@ import './App.css';
 import Home from './components/home';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Calenderpage from './components/calendrierPage';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { RouterProvider } from "react-router-dom";
 import Login from './components/Login';
 import Register from './components/Register';
+import { router } from "./Router";
 
 
 function App() {
@@ -19,16 +20,18 @@ function App() {
       <Route exact path="/calendar" element={<Calenderpage />} />
     </Routes>
   </Router>*/
-  <>
-    
-      <Routes>
-        <Route path="/login" element={<Login/>} />
-        <Route path="/register" element={<Register/>} />
-        <Route path="/calendar" element={<Calenderpage/>} />
-        <Route path="/" element={<Home />} />
 
-      </Routes>
-  </>
+  <RouterProvider router={router}/>
+
+      // <Routes>
+      //   <Route path="/login" element={<Login/>} />
+      //   <Route path="/register" element={<Register/>} />
+      //   <Route path="/calendar" element={<Calenderpage/>} />
+      //   <Route path="/" element={<Home />} />
+      //   <Route path="/edit/:eventdata" element={<Home />} />
+
+      // </Routes>
+
   );
 }
 

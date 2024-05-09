@@ -5,11 +5,31 @@ import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { IoSearch } from "react-icons/io5";
 import profil from "../../assets/images/Innovation page.png";
 import profil2 from "../../assets/images/Innovation page.png";
-import "../../styles/navbar.css"
+import "../../styles/navbar.css";
+import { connect, useDispatch, useSelector } from "react-redux";
+import * as actionTypes from "../../reducers/actionTypes";
+import { Navigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
-    const [Mobile, setMobile] = useState(false);
-    const [selected, setSelected] = useState(false);
+  const [Mobile, setMobile] = useState(false);
+  const [selected, setSelected] = useState(false);
+  const [clicked, setClicked] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const userData = useSelector((data) => data.user);
+
+  const handleClick = () => {
+    setClicked(!clicked);
+  };
+  const logout = () => {
+    dispatch({
+      type: actionTypes.logout_SUCCESS,
+      user: null,
+    });
+
+    console.log("userdatau", userData);
+  };
 
   return (
     <nav className="navbar">
@@ -18,7 +38,7 @@ function Navbar() {
           onClick={() => setMobile(false)}
           className={Mobile ? "nav-links-mobile" : "nav-links "}
         >
-          <li class={selected ? "nav-item menu  ":"nav-item selected"}>
+          <li class={selected ? "nav-item menu  " : "nav-item selected"}>
             <div class=" profile-pic">
               <li>Schedule</li>
             </div>
@@ -36,61 +56,32 @@ function Navbar() {
           <div className="search-icon">
             <IoSearch size={25} />
           </div>
-          <li class="nav-item dropdown">
+          <li
+            class="nav-item dropdown"
+            onClick={handleClick}
+            style={{ cursor: "pointer" }}
+          >
             <div class=" profile-pic">
               {" "}
               <img src={profil} alt="user-img" class="img-circle" />
               <span>Beya Marzouk</span> <MdOutlineKeyboardArrowDown />
             </div>
-            <ul class="dropdown-menu dropdown-user">
-              <li>
-                <div class="user-box">
-                  <div class="u-img">
-                    <img src={profil2} alt="user" />
-                  </div>
-                  <div class="u-text">
-                    <h4>Hizrian</h4>
-                    <p class="text-muted">hello@themekita.com</p>
-                    <a
-                      href="profile.html"
-                      class="btn btn-rounded btn-danger btn-sm"
-                    >
-                      View Profile
-                    </a>
-                  </div>
-                </div>
-              </li>
+            <ul
+              class={clicked ? "dropdown-menu dropdown-user" : "dropdown-menu "}
+            >
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="#">
-                <i class="ti-user"></i> My Profile
-              </a>
-              <a class="dropdown-item" href="#">
-                {" "}
-                My Balance
-              </a>
-              <a class="dropdown-item" href="#">
-                <i class="ti-email"></i> Inbox
-              </a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="#">
-                <i class="ti-settings"></i> Account Setting
-              </a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="#">
+              <a class="dropdown-item" onClick={logout}>
                 <i class="fa fa-power-off"></i> Logout
               </a>
             </ul>
           </li>
         </div>
       </div>
-      <button
-        className="mobile-menu-icon"
-        onClick={() => setMobile(!Mobile)}
-      >
+      <button className="mobile-menu-icon" onClick={() => setMobile(!Mobile)}>
         {Mobile ? <ImCross /> : <FaBars />}
       </button>
     </nav>
-  )
+  );
 }
 
-export default Navbar
+export default Navbar;

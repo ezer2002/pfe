@@ -581,3 +581,8 @@ right: 1px; /* Adjust right position */
 .audio-container.active {
   background-color: #2196F3; /* Bleu pour indiquer l'enregistrement actif */
 }
+
+.titleeditsection{
+  display: flex;
+  justify-content: space-between;
+}
