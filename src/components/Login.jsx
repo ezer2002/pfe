@@ -12,7 +12,9 @@ const Login = () => {
   const dispatch = useDispatch();
 
 
-
+  const axiosInstance = axios.create({
+    baseURL: 'http://127.0.0.1:8000/api'
+  });
   const login = async (e) => {
     e.preventDefault();
 
@@ -21,8 +23,8 @@ const Login = () => {
     formData.append("password", password);
 
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/login",
+      const response = await axiosInstance.post(
+        "/login",
         formData, // Ajoutez les données à envoyer
         {
           headers: {
