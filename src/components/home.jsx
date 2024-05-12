@@ -1,10 +1,14 @@
-import React, { useState, useRef,useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { BsStars } from "react-icons/bs";
-import { BiLock, BiPhotoAlbum} from "react-icons/bi";
-import { FiImage } from 'react-icons/fi';
+import { BiLock, BiPhotoAlbum } from "react-icons/bi";
+import { FiImage } from "react-icons/fi";
 import { GoVideo } from "react-icons/go";
 import { FiSend } from "react-icons/fi";
 import { MdMoreTime } from "react-icons/md";
+
+import { MdOutlineDeleteOutline } from "react-icons/md";
+
+
 import { IoSaveOutline } from "react-icons/io5";
 import InputEmoji from "react-input-emoji";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
@@ -12,32 +16,35 @@ import user from "../assets/images/Innovation page.png";
 import { CiHeart } from "react-icons/ci";
 import { GoComment } from "react-icons/go";
 import { RiShareForwardLine } from "react-icons/ri";
-import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { Grid, Paper, Typography } from '@material-ui/core';
-import DateTimePicker from 'react-datetime-picker';
-import 'react-datetime-picker/dist/DateTimePicker.css';
-import 'react-calendar/dist/Calendar.css';
-import 'react-clock/dist/Clock.css';
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Grid, Paper, Typography } from "@material-ui/core";
+import DateTimePicker from "react-datetime-picker";
+import "react-datetime-picker/dist/DateTimePicker.css";
+import "react-calendar/dist/Calendar.css";
+import "react-clock/dist/Clock.css";
 import { TiTickOutline } from "react-icons/ti";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import { AiTwotoneAudio } from "react-icons/ai";
 import { useReactMediaRecorder } from "react-media-recorder";
 import { FaRegStopCircle } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { useParams } from 'react-router-dom';
+import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import ConfirmModal from "./Navigation/modal";
+import { connect, useDispatch, useSelector } from "react-redux";
 
 function Home() {
   const location = useLocation();
   const params = new URLSearchParams(window.location.search);
   const encodedData = params.get("data");
+  const userData = useSelector((data) => data.user);
 
   const { eventdata } = useParams();
-  const data =eventdata? JSON.parse(eventdata):null;
+  const data = eventdata ? JSON.parse(eventdata) : null;
 
   const [loadingPublish, setLoadingPublish] = useState(false);
   const [loadingProgram, setLoadingProgram] = useState(false);
@@ -49,9 +56,13 @@ function Home() {
   const [selectedFiles, setselectedFiles] = useState([]);
   const [columns, setColumns] = useState([]);
 
+  const [social_id, setsocial_id] = useState("");
+
+  
   const [imagelocale, setImageLocale] = useState(
-    data ?`http://127.0.0.1:8000/${data.media_path}`:""
-  );  const [image, setImage] = useState("");
+    data && data.media_path ? `http://127.0.0.1:8000/${data.media_path}` : ""
+  );
+  const [image, setImage] = useState("");
   const [videoFile, setVideoFile] = useState(null);
   const [videoFiles, setVideoFiles] = useState([]);
   const [responseData, setResponseData] = useState(null);
@@ -63,6 +74,7 @@ function Home() {
   const [valuetime, setvaluetime] = useState(new Date());
 
   const [program, setprogram] = useState(false);
+  const [pages, setPages] = useState([]);
 
   //audio
   const [isRecording, setIsRecording] = useState(false);
@@ -75,8 +87,24 @@ function Home() {
 
   //eventId
   const { eventId } = useParams();
+  const get = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/getUserPages", {
+                    params: {
+                        user_id: userData
+                    }
+                });      setPages(response.data);
+      console.log("page",response.data);
+    } catch (err) {
+      console.log("err");
+    }
+  };
+  useEffect(() => {
+    get()
+  }, )
   
   useEffect(() => {
+    
     let intervalId;
 
     if (isActive) {
@@ -113,11 +141,11 @@ function Home() {
     startRecording,
     stopRecording,
     pauseRecording,
-    mediaBlobUrl
+    mediaBlobUrl,
   } = useReactMediaRecorder({
     video: false,
     audio: true,
-    echoCancellation: true
+    echoCancellation: true,
   });
 
   const handleVideoChange = (event) => {
@@ -135,50 +163,62 @@ function Home() {
 
   const handleFilesChange = (event) => {
     const files = event.target.files;
-  
+
     // Vérifier si des fichiers ont été sélectionnés
     if (files.length === 0) {
       return;
     }
-  
-    const isImage = files[0].type.startsWith('image/');
-    const isVideo = files[0].type.startsWith('video/');
-  
+
+    const isImage = files[0].type.startsWith("image/");
+    const isVideo = files[0].type.startsWith("video/");
+
     if (!isImage && !isVideo) {
       // Utilisation de toast pour afficher un message d'erreur
-      toast.error('Please choose an image or a video.');
+      toast.error("Please choose an image or a video.");
       return;
     }
-  
+
     // Si c'est une image
     if (isImage) {
       setImage(null);
       setImageLocale(null);
     }
-  
+
     // Si c'est une vidéo
     if (isVideo) {
       setVideoFile(null);
       setVideoFiles(null);
     }
 
-     // Parcourir les fichiers pour les ajouter à selectedFiles
-     const updatedSelectedFiles = Array.from(files).map(file => ({
+    // Parcourir les fichiers pour les ajouter à selectedFiles
+    const updatedSelectedFiles = Array.from(files).map((file) => ({
       file,
-      type: file.type
+      type: file.type,
     }));
-  
+
     setselectedFiles(updatedSelectedFiles);
   };
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleConfirm = () => {
+    // Handle confirmation logic here
+    console.log('Confirmed');
+    setIsModalOpen(false);
+  };
   const handleFileChange = (e) => {
- 
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       setImage(file);
 
-  
       setColumns([]);
       reader.onloadend = function () {
         setImageLocale(reader.result);
@@ -268,10 +308,9 @@ function Home() {
     setColumns([col1, col2]);
   }, [selectedFiles]);
 
- 
   const publishPost = async (e) => {
     e.preventDefault();
-    
+
     /*const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
     axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;*/
 
@@ -279,6 +318,9 @@ function Home() {
     formData.append("message", text);
     formData.append("page_id", "115449061452354");
     formData.append("media_path", image ?? videoFile);
+    formData.append("social_id", selectedValue);
+
+    
     /*if (image) {
       formData.append("media_path", image, image.name);
     }
@@ -313,35 +355,37 @@ function Home() {
       );
       setLoadingPublish(false);
       toast.success("Post published successfully.");
-      setText()
+      setText();
       setImage(null);
       setImageLocale(null);
       setselectedFiles([]);
-  
+
       setColumns([]);
     } catch (err) {
-        setLoadingPublish(false);
-        toast.success("An error occurred.");
-        console.log(err);
+      setLoadingPublish(false);
+      toast.success("An error occurred.");
+      console.log(err);
     }
   };
-  
 
   const schedulePost = async (e) => {
     e.preventDefault();
-    
+
     const formData = new FormData();
-      formData.append("message", text);
-      formData.append("page_id", "115449061452354");
-      formData.append("media_path", image ?? videoFile);
-      formData.append("scheduled_datetime", dayjs(valuetime).format('YYYY-MM-DD HH:mm:ss'));
-  
-      selectedFiles.forEach((media, index) => {
-        formData.append(`media_paths[${index}]`, media.file);
-      });
-  
+    formData.append("message", text);
+    formData.append("page_id", "115449061452354");
+    formData.append("media_path", image ?? videoFile);
+    formData.append(
+      "scheduled_datetime",
+      dayjs(valuetime).format("YYYY-MM-DD HH:mm:ss")
+    );
+
+    selectedFiles.forEach((media, index) => {
+      formData.append(`media_paths[${index}]`, media.file);
+    });
+
     try {
-      setLoadingProgram(true); 
+      setLoadingProgram(true);
       const response = await axios.post(
         "http://127.0.0.1:8000/api/schedule-post",
         formData, // Ajoutez les données à envoyer
@@ -351,9 +395,9 @@ function Home() {
           },
         }
       );
-      setLoadingProgram(false); 
+      setLoadingProgram(false);
       toast.success("Publication scheduled successfully.");
-      setText()
+      setText();
       setImage(null);
       setImageLocale(null);
       setvaluetime(null);
@@ -361,42 +405,47 @@ function Home() {
 
       setColumns([]);
     } catch (err) {
-      toast.error("The publication date must be between 10 minutes and 30 days after the current date.");
+      toast.error(
+        "The publication date must be between 10 minutes and 30 days after the current date."
+      );
       console.log(err);
       setprogram(false);
     }
-    
   };
 
   const saveAsDraft = async (e) => {
     e.preventDefault();
     setLoadingDraft(true);
-  
+
     const formData = new FormData();
-      formData.append('message', text);
-      formData.append('page_id', '115449061452354');
-      formData.append('media_path', image ?? videoFile);
-  
-      selectedFiles.forEach((media, index) => {
-        formData.append(`media_paths[${index}]`, media.file);
-      });
+    formData.append("message", text);
+    formData.append("page_id", "115449061452354");
+    formData.append("media_path", image ?? videoFile);
+
+    selectedFiles.forEach((media, index) => {
+      formData.append(`media_paths[${index}]`, media.file);
+    });
     try {
       setLoadingDraft(true);
-      const response =await axios.post("http://127.0.0.1:8000/api/save-post", formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/save-post",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       setLoadingDraft(false);
-      toast.success('Post saved as draft.');
-      setText()
+      toast.success("Post saved as draft.");
+      setText();
       setImage(null);
       setImageLocale(null);
       setColumns([]);
     } catch (err) {
-      toast.error('An error occurred while saving as draft.');
+      toast.error("An error occurred while saving as draft.");
       console.log(err);
-    }  
+    }
   };
 
   const toggleRecording = () => {
@@ -409,39 +458,37 @@ function Home() {
   };
 
   const recognition = new window.webkitSpeechRecognition();
-  
+
   const handleVoiceToText = () => {
     recognition.interimResults = true;
     recognition.continuous = true; // Continue à écouter même après des pauses courtes
-  
-      
+
     recognition.onresult = (e) => {
-      let transcript = '';
+      let transcript = "";
       for (const result of e.results) {
         transcript += result[0].transcript;
       }
       setText(transcript);
     };
-  
+
     recognition.onend = () => {
       // Optionnel: redémarrer la reconnaissance si nécessaire
       if (!recognition.aborted) {
         recognition.start();
-      } 
+      }
     };
-  
+
     recognition.onerror = (event) => {
       // Gérez ici les erreurs.
       console.error("Voice recognition error. ", event.error);
     };
-    
+
     if (!isRecording) {
       // Commencer l'enregistrement vocal
       recognition.start();
       setIsRecording(true);
     }
-    // 
-
+    //
   };
 
   const stopTranscription = () => {
@@ -450,9 +497,7 @@ function Home() {
       recognition.abort();
       setIsRecording(false);
     }
-  }
-
-  
+  };
 
   return (
     <div className="row">
@@ -460,25 +505,27 @@ function Home() {
         <div className="mb-3">
           <div className="cadre">
             <h6 className="title">Post in</h6>
-              <div>
-                <select
-                  className="form-select"
-                  value={selectedValue}
-                  onChange={handleDropdownChange}
-                >
-                  <option value="">Select an account</option>
-                  <option value="BaristasCafe">
-                    <span style={{ fontWeight: 'bold', color: '#A020F0' }}>Barista's Café</span>{" "}
-                    <span style={{ color: 'gray' }}>@Barista's Coffeeshop</span>
-                  </option>
-                  <option value="Innovation page">
-                    <span style={{ fontWeight: 'bold', color: '#A020F0' }}>Innovation page</span>
-                  </option>
-                  {/* Add more options as needed */}
-                </select>
-              </div>
+            <div>
+              <select
+                className="form-select"
+                value={selectedValue}
+                onChange={handleDropdownChange}
+              >
+                    {pages.map(page => (
+                    <option key={page.id} value={page.id}>
+                        <span style={{ fontWeight: "bold", color: "#A020F0" }}>
+                            {page.page_name}
+                        </span>{" "}
+                        <span style={{ color: "gray" }}>@{page.page_id}</span>
+                    </option>
+                ))}
+     
+            
+                {/* Add more options as needed */}
+              </select>
             </div>
           </div>
+        </div>
 
         <div className="mb-3">
           <div className="cadre">
@@ -497,141 +544,154 @@ function Home() {
                   maxLength={50}
                   placeholder="Add tags"
                 />
-                  <div >  
-                      <div>
-                        <div style={{
-                          display:"flex",
-                          paddingTop:"15px"
-                        }}>
-                    
-                          <button
-                            style={{
-                              border: "none",
-                              fontSize: "1.3rem",
-                              cursor: "pointer",
-                              color: "black",
-                           }}
-                           onClick={toggleRecording}
-                          >
-                            
-                            {isActive ? (
-                              <FaRegStopCircle onClick={stopTranscription}  />  
-                            ) : (
-                              <AiTwotoneAudio onClick={handleVoiceToText} />
-                            )}
-                          </button>
-                          
-                          
-                        </div>
-                        
-                        <div style={{ fontSize: "14px" }}>
-                          <span className="minute">{minute}</span>
-                          <span>:</span>
-                          <span className="second">{second}</span>
-                        </div>
-                      </div>
+                <div>
+                  <div>
+                    <div
+                      style={{
+                        display: "flex",
+                        paddingTop: "15px",
+                      }}
+                    >
+                      <button
+                        style={{
+                          border: "none",
+                          fontSize: "1.3rem",
+                          cursor: "pointer",
+                          color: "black",
+                        }}
+                        onClick={toggleRecording}
+                      >
+                        {isActive ? (
+                          <FaRegStopCircle onClick={stopTranscription} />
+                        ) : (
+                          <AiTwotoneAudio onClick={handleVoiceToText} />
+                        )}
+                      </button>
+                    </div>
+
+                    <div style={{ fontSize: "14px" }}>
+                      <span className="minute">{minute}</span>
+                      <span>:</span>
+                      <span className="second">{second}</span>
                     </div>
                   </div>
-                  <p className="description">Your text must not exceed 40 words</p>
-                  
-              <div className="line"></div>
-              
-              <div className="d-flex justify-content-end">
-                <button 
-                  className="cancel me-2" 
-                  onClick={handleCancel}
-                >
-                  Cancel
-                </button>
-                {loadingGenerate  ? (
-                  <div class="loader"></div>
-                ) : (
-                  <button
-                    className="active" 
-                    onClick={Generer}
-                  >
-                    <BsStars />
-                    Génerate
-                  </button>
-                )}
+                </div>
               </div>
+              <p className="description">Your text must not exceed 40 words</p>
+
+              <div className="line"></div>
+
+              {data && data.subtitle === "saved as draft" && (
+                <div className="d-flex justify-content-end">
+                  <button className="cancel me-2" onClick={handleCancel}>
+                    Cancel
+                  </button>
+                  {loadingGenerate ? (
+                    <div class="loader"></div>
+                  ) : (
+                    <button className="active" onClick={Generer}>
+                      <BsStars />
+                      Génerate
+                    </button>
+                  )}
+                </div>
+              )}
+              {!data && (
+                <div className="d-flex justify-content-end">
+                  <button className="cancel me-2" onClick={handleCancel}>
+                    Cancel
+                  </button>
+                  {loadingGenerate ? (
+                    <div class="loader"></div>
+                  ) : (
+                    <button className="active" onClick={Generer}>
+                      <BsStars />
+                      Génerate
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
-        
-        <div className="mb-3">
-            <div className="cadre">
-              <h6 className="title">Multimedia content</h6>
-              <p className="description">
-                Share photos or video, Instagram posts cannot exceed 10 photos
-              </p>
-              <div className="d-flex ">
-                <label
-                  htmlFor="select-image"
-                  className="d-flex buttons align-items-center"
-                  onClick={handleResetSelection}
-                >
-                  <input
-                    ref={imageInputRef}
-                    onChange={handleFileChange}
-                    type="file"
-                    id="select-image"
-                    accept="image/*"
-                    style={{ display: "none" }}
-                  />
-                  <MdOutlineAddPhotoAlternate
-                    style={{ color: "#A020F0" }}
-                    className="mx-1"
-                  />
-                  Add photo
-                </label>
+        {data && data.subtitle === "saved as draft" && (
+          <>
+            <div className="mb-3">
+              <div className="cadre">
+                <h6 className="title">Multimedia content</h6>
+                <p className="description">
+                  Share photos or video, Instagram posts cannot exceed 10 photos
+                </p>
+                <div className="d-flex ">
+                  <label
+                    htmlFor="select-image"
+                    className="d-flex buttons align-items-center"
+                    onClick={handleResetSelection}
+                  >
+                    <input
+                      ref={imageInputRef}
+                      onChange={handleFileChange}
+                      type="file"
+                      id="select-image"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                    />
+                    <MdOutlineAddPhotoAlternate
+                      style={{ color: "#A020F0" }}
+                      className="mx-1"
+                    />
+                    Add photo
+                  </label>
 
-                <label
-                  htmlFor="select-images"
-                  className="d-flex ms-3 buttons align-items-center"
-                  onClick={handleResetSelection}
-                >
-                  <input
-                    ref={imagesInputRef}
-                    onChange={handleFilesChange}
-                    type="file"
-                    id="select-images"
-                    multiple
-                    style={{ display: "none" }}
-                  />
-                  <BiPhotoAlbum style={{ color: "#A020F0" }} className="mx-1" />
-                  Add album
-                </label>
-                <label
-                  htmlFor="select-video"
-                  className="buttons ms-3 d-flex align-items-center"
-                  onClick={handleResetSelection}
-                >
-                  <input
-                    ref={videoInputRef}
-                    onChange={handleVideoChange}
-                    type="file"
-                    id="select-video"
-                    accept="video/*"
-                    style={{ display: "none" }}
-                  />
-                  <GoVideo style={{ color: "#A020F0" }} className="mx-1" />
-                  Add video
-                </label>
+                  <label
+                    htmlFor="select-images"
+                    className="d-flex ms-3 buttons align-items-center"
+                    onClick={handleResetSelection}
+                  >
+                    <input
+                      ref={imagesInputRef}
+                      onChange={handleFilesChange}
+                      type="file"
+                      id="select-images"
+                      multiple
+                      style={{ display: "none" }}
+                    />
+                    <BiPhotoAlbum
+                      style={{ color: "#A020F0" }}
+                      className="mx-1"
+                    />
+                    Add album
+                  </label>
+                  <label
+                    htmlFor="select-video"
+                    className="buttons ms-3 d-flex align-items-center"
+                    onClick={handleResetSelection}
+                  >
+                    <input
+                      ref={videoInputRef}
+                      onChange={handleVideoChange}
+                      type="file"
+                      id="select-video"
+                      accept="video/*"
+                      style={{ display: "none" }}
+                    />
+                    <GoVideo style={{ color: "#A020F0" }} className="mx-1" />
+                    Add video
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="mb-3">
-            <div className="cadre">
-              <h6 className="title">Programming options</h6>
-              <div className="d-flex ">
-                <form
-                  onSubmit={publishPost}
-                  method="post"
-                  formEncType="multipart/form-data"
-                >
-                    {loadingPublish  ? (
+            <div className="mb-3">
+              <div className="cadre">
+                <h6 className="title">Programming options</h6>
+                <div className="d-flex ">
+                  <form
+                    onSubmit={publishPost}
+                    method="post"
+                    formEncType="multipart/form-data"
+                  >
+                    {loadingPublish ? (
                       <div class="loader"></div>
                     ) : (
                       <button
@@ -643,73 +703,254 @@ function Home() {
                         Publier
                       </button>
                     )}
-                </form>
+                  </form>
 
-                <form 
-                  onSubmit={schedulePost} 
-                  method="post" 
-                  formEncType="multipart/form-data"
-                >
-             
-                   <div className="" > 
-                 
-                    {program ? (
-                      <div className='programme'>    
-                        <div className="ms-3  d-flex align-items-center ">
-                          <DateTimePicker
-                            onChange={setvaluetime}
-                            value={valuetime}
-                            className="custom-picker"
-                          />
-                        </div> 
-                        <div className='tcheck'>
-                          
-                          {
-                            loadingProgram?    <div className="loader"></div> :  
-                            
-                            <TiTickOutline style={{ color: "#A020F0" }} size={30} onClick={schedulePost}/>  
-                          }
+                  <form
+                    onSubmit={schedulePost}
+                    method="post"
+                    formEncType="multipart/form-data"
+                  >
+                    <div className="">
+                      {program ? (
+                        <div className="programme">
+                          <div className="ms-3  d-flex align-items-center ">
+                            <DateTimePicker
+                              onChange={setvaluetime}
+                              value={valuetime}
+                              className="custom-picker"
+                            />
+                          </div>
+                          <div className="tcheck">
+                            {loadingProgram ? (
+                              <div className="loader"></div>
+                            ) : (
+                              <TiTickOutline
+                                style={{ color: "#A020F0" }}
+                                size={30}
+                                onClick={schedulePost}
+                              />
+                            )}
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <button
+                          className="ms-3 buttons d-flex align-items-center"
+                          onClick={VoirCalendrier}
+                        >
+                          <MdMoreTime
+                            style={{ color: "#A020F0" }}
+                            className="mx-1"
+                          />
+                          program
+                        </button>
+                      )}
+                    </div>
+                  </form>
+
+                  <form
+                    onSubmit={saveAsDraft}
+                    method="post"
+                    formEncType="multipart/form-data"
+                  >
+                    {loadingDraft ? (
+                      <div class="loader"></div>
                     ) : (
                       <button
-                        className="ms-3 buttons d-flex align-items-center"
-                        onClick={VoirCalendrier}
+                        className=" ms-3  buttons d-flex align-items-center"
+                        type="submit"
+                        onClick={saveAsDraft}
                       >
-                        <MdMoreTime style={{ color: "#A020F0" }} className="mx-1" />
-                        program
+                        <IoSaveOutline
+                          style={{ color: "#A020F0" }}
+                          className="mx-1"
+                        />
+                        Save as a draft
                       </button>
                     )}
-                
-                  </div>
-                </form>
-
-
-                <form
-                  onSubmit={saveAsDraft}
-                  method="post"
-                  formEncType="multipart/form-data"
-                >
-                  {loadingDraft  ? (
-                    <div class="loader"></div>
-                  ) : (
-                    <button
-                      className=" ms-3  buttons d-flex align-items-center"
-                      type="submit"
-                      onClick={saveAsDraft}
-                    >
-                      <IoSaveOutline
-                        style={{ color: "#A020F0" }}
-                        className="mx-1"
-                      />
-                      Save as a draft
-                    </button>
-                  )}
-                </form>
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
+          </>
+        )}
+        {!data && (
+          <>
+            <div className="mb-3">
+              <div className="cadre">
+                <h6 className="title">Multimedia content</h6>
+                <p className="description">
+                  Share photos or video, Instagram posts cannot exceed 10 photos
+                </p>
+                <div className="d-flex ">
+                  <label
+                    htmlFor="select-image"
+                    className="d-flex buttons align-items-center"
+                    onClick={handleResetSelection}
+                  >
+                    <input
+                      ref={imageInputRef}
+                      onChange={handleFileChange}
+                      type="file"
+                      id="select-image"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                    />
+                    <MdOutlineAddPhotoAlternate
+                      style={{ color: "#A020F0" }}
+                      className="mx-1"
+                    />
+                    Add photo
+                  </label>
+
+                  <label
+                    htmlFor="select-images"
+                    className="d-flex ms-3 buttons align-items-center"
+                    onClick={handleResetSelection}
+                  >
+                    <input
+                      ref={imagesInputRef}
+                      onChange={handleFilesChange}
+                      type="file"
+                      id="select-images"
+                      multiple
+                      style={{ display: "none" }}
+                    />
+                    <BiPhotoAlbum
+                      style={{ color: "#A020F0" }}
+                      className="mx-1"
+                    />
+                    Add album
+                  </label>
+                  <label
+                    htmlFor="select-video"
+                    className="buttons ms-3 d-flex align-items-center"
+                    onClick={handleResetSelection}
+                  >
+                    <input
+                      ref={videoInputRef}
+                      onChange={handleVideoChange}
+                      type="file"
+                      id="select-video"
+                      accept="video/*"
+                      style={{ display: "none" }}
+                    />
+                    <GoVideo style={{ color: "#A020F0" }} className="mx-1" />
+                    Add video
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <div className="cadre">
+                <h6 className="title">Programming options</h6>
+                <div className="d-flex ">
+                  <form
+                    onSubmit={publishPost}
+                    method="post"
+                    formEncType="multipart/form-data"
+                  >
+                    {loadingPublish ? (
+                      <div class="loader"></div>
+                    ) : (
+                      <button
+                        className="d-flex   active align-items-center"
+                        type="submit"
+                        onClick={publishPost}
+                      >
+                        <FiSend className="mx-1" />
+                        Publier
+                      </button>
+                    )}
+                  </form>
+
+                  <form
+                    onSubmit={schedulePost}
+                    method="post"
+                    formEncType="multipart/form-data"
+                  >
+                    <div className="">
+                      {program ? (
+                        <div className="programme">
+                          <div className="ms-3  d-flex align-items-center ">
+                            <DateTimePicker
+                              onChange={setvaluetime}
+                              value={valuetime}
+                              className="custom-picker"
+                            />
+                          </div>
+                          <div className="tcheck">
+                            {loadingProgram ? (
+                              <div className="loader"></div>
+                            ) : (
+                              <TiTickOutline
+                                style={{ color: "#A020F0" }}
+                                size={30}
+                                onClick={schedulePost}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          className="ms-3 buttons d-flex align-items-center"
+                          onClick={VoirCalendrier}
+                        >
+                          <MdMoreTime
+                            style={{ color: "#A020F0" }}
+                            className="mx-1"
+                          />
+                          program
+                        </button>
+                      )}
+                    </div>
+                  </form>
+
+                  <form
+                    onSubmit={saveAsDraft}
+                    method="post"
+                    formEncType="multipart/form-data"
+                  >
+                    {loadingDraft ? (
+                      <div class="loader"></div>
+                    ) : (
+                      <button
+                        className=" ms-3  buttons d-flex align-items-center"
+                        type="submit"
+                        onClick={saveAsDraft}
+                      >
+                        <IoSaveOutline
+                          style={{ color: "#A020F0" }}
+                          className="mx-1"
+                        />
+                        Save as a draft
+                      </button>
+                    )}
+                  </form>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+           <div>
+        {data && data.subtitle === "saved as draft" && <div className="delete-container">
+          
+          
+        <button
+                          className="ms-3 buttons delete d-flex align-items-center"
+                          onClick={handleOpenModal} 
+                        >
+                          <MdOutlineDeleteOutline
+                            style={{ color: "white" }}
+                            className="mx-1"
+                          />
+                          Delete
+                        </button>
+          
+          </div>}
       </div>
+      </div>
+   
 
       <div className="col-md-6">
         <div className="mb-3">
@@ -800,7 +1041,7 @@ function Home() {
                                   X
                                 </button>
                                 <div className={index == 1 ? "trois" : "tow"}>
-                                  {media.type.startsWith('image/') && (
+                                  {media.type.startsWith("image/") && (
                                     <img
                                       src={URL.createObjectURL(media.file)}
                                       alt={media.name}
@@ -812,9 +1053,10 @@ function Home() {
                                       }
                                     />
                                   )}
-                                  
-                                  {media.file.type.startsWith('video/') && (
-                                    <video controls
+
+                                  {media.file.type.startsWith("video/") && (
+                                    <video
+                                      controls
                                       src={URL.createObjectURL(media.file)}
                                       alt={media.name}
                                       key={media.id}
@@ -841,7 +1083,6 @@ function Home() {
                         ))}
                       </Grid>
                     </div>
-
                   </p>
                 </div>
               </div>
@@ -863,12 +1104,16 @@ function Home() {
           </div>
         </div>
       </div>
+      
+      <ConfirmModal
+        isOpen={isModalOpen}
+        message="Are you sure you want to proceed?"
+        onConfirm={() => handleConfirm(data.id)} 
+        onCancel={handleCloseModal}
+      />
       <ToastContainer />
     </div>
   );
 }
 
 export default Home;
-
-
-

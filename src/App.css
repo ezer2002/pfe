@@ -91,6 +91,22 @@ padding-bottom: 10px;
     padding-block: 4px;
    }
 
+   .buttons.delete{
+    background-color: red;
+    border-radius: 5px;
+    border: 1px solid rgb(156, 156, 156);
+    padding-inline: 12px;
+    font-weight: 600;
+    padding-block: 4px;
+    color: white;
+    margin: auto;
+   }
+   .delete-container{
+    margin: auto;
+    width: 50%;
+
+   }
+
   .cadre > div > p{
     font-weight:500;
     color: gray;
@@ -585,4 +601,15 @@ right: 1px; /* Adjust right position */
 .titleeditsection{
   display: flex;
   justify-content: space-between;
+}
+
+.icons{
+  display: flex;
+}
+
+.icons.disabled{
+  display: flex;
+  pointer-events: none; /* Empêche les événements de la souris */
+  opacity: 0.5; /* Réduit l'opacité pour indiquer visuellement que le bouton est désactivé */
+  cursor: not-allowed; 
 }

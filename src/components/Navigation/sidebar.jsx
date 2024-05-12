@@ -1,28 +1,34 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaSquareFacebook } from "react-icons/fa6";
 import { BsInstagram } from "react-icons/bs";
 import { IoLogoLinkedin } from "react-icons/io5";
 import logo from "../../assets/images/Innovation page.png";
 import { SlCalender } from "react-icons/sl";
-import "../../styles/sidebar.css"
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import "../../styles/sidebar.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import axios from "axios";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { ToastContainer, toast } from "react-toastify";
+import DeclarativeDemo from "../deletedialog";
+import ConfirmModal from "./modal";
+import { connect, useDispatch, useSelector } from "react-redux";
 
 function Sidebar() {
+  const userData = useSelector((data) => data.user);
+
   const [expanded, setExpanded] = useState(false);
   const [Mobile, setMobile] = useState(false);
   const [selected, setSelected] = useState(false);
-  const [pages,setPages]=useState([])
+  const [pages, setPages] = useState([]);
   const toggleSelected = () => {
     setSelected(!selected);
   };
-  const [nompage, setNomPage] = useState();
-  const [pageId, setPageId] = useState(false);
-  const [accessToken, setAccessToken] = useState();
+  const [nompage, setNomPage] = useState("");
+  const [pageId, setPageId] = useState("");
+  const [accessToken, setAccessToken] = useState("");
 
   const toggleSidebar = () => {
     setExpanded(!expanded);
@@ -32,59 +38,81 @@ function Sidebar() {
   const togglePopup = () => {
     setshowpopup(!showpopup);
   };
-  const add =async ()=>{
-    try {
-    const response = await axios.post(
-      "http://127.0.0.1:8000/api/addpagesociaux",
-      {
-        page_name: nompage,
-        page_id: pageId,
+  const add = async () => {
+    if (
+      nompage.trim() == "" ||
+      pageId.trim() == "" ||
+      accessToken.trim() == ""
+    ) {
+      toast.error("verifier vos données .");
+    } else {
+      try {
+        const response = await axios.post(
+          "http://127.0.0.1:8000/api/addpagesociaux",
+          {
+            page_name: nompage,
+            page_id: pageId,
 
-        access_token: accessToken,
+            access_token: accessToken,
+            user_id:userData
+          }
+        );
 
-      }  );
-      
-      console.log("add")
-    setshowpopup(false)
-    } catch (err) {
-          console.log("err")
+        console.log(userData);
+        setshowpopup(false);
+      } catch (err) {
+        console.log("err");
       }
-      get()
-   
-  }
+      get();
+    }
+  };
   useEffect(() => {
-    get()
-  }, [])
-  
-  const deletepage =(id)=>{
-    console.log(id)
-    axios.delete('http://127.0.0.1:8000/api/pages/' + id)
-    .then(response => {
+    get();
+  }, []);
+
+  const deletepage = (id) => {
+    console.log(id);
+    axios
+      .delete("http://127.0.0.1:8000/api/pages/" + id)
+      .then((response) => {
         console.log(response.data.message);
-        get()
+        get();
         // Actualiser la liste des pages ou effectuer d'autres actions après la suppression
-    })
+      })
 
-    .catch(error => {
-        console.error('Error deleting page:', error);
-    });
-  }
-  const get =async ()=>{
+      .catch((error) => {
+        console.error("Error deleting page:", error);
+      });
+  };
+  const get = async () => {
     try {
-    const response = await axios.get(
-      "http://127.0.0.1:8000/api/getAllpage",
-   );
-      setPages(response.data)
-    console.log(response.data)
+      const response = await axios.get("http://127.0.0.1:8000/api/getUserPages", {
+                    params: {
+                        user_id: userData
+                    }
+                });      setPages(response.data);
+      console.log("page",response.data);
     } catch (err) {
-          console.log("err")
-      }
+      console.log("err");
+    }
+  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-   
-  }
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleConfirm = () => {
+    // Handle confirmation logic here
+    console.log("Confirmed");
+    setIsModalOpen(false);
+  };
   return (
-    <>    
+    <>
       <aside id="sidebar" className="sidebar-tow">
         <div className="sidebar-header-tow">
           <img src={logo}></img>
@@ -106,7 +134,7 @@ function Sidebar() {
           </a>
         </div>
       </aside>
-      
+
       <aside id="sidebar" className={expanded ? "expand" : ""}>
         <div className="sidebar-header">
           <div class="sidebar-logo">
@@ -117,25 +145,23 @@ function Sidebar() {
           </button>
         </div>
         <ul class="sidebar-nav">
-        <li class="sidebar-item" >
-                <a 
-                
-                     class="sidebar-link collapsed"
-                     data-bs-toggle="collapse"
-                     data-bs-target="#add"
-                     aria-expanded="false"
-                     aria-controls="add"
-               style={{color:"blue",cursor:"pointer"}}   onClick={() => setshowpopup(true)}>
-{/* 
+          <li class="sidebar-item">
+            <a
+              class="sidebar-link collapsed"
+              data-bs-toggle="collapse"
+              data-bs-target="#add"
+              aria-expanded="false"
+              aria-controls="add"
+              style={{ color: "blue", cursor: "pointer" }}
+              onClick={() => setshowpopup(true)}
+            >
+              {/* 
                   <span className="icon-mini-menu ">A</span> */}
-                     
-                    <IoIosAddCircleOutline size={20}    />    
-                    <span>     Ajouter une page    </span>
 
-                      </a>
-       
-
-              </li>
+              <IoIosAddCircleOutline size={20} />
+              <span> Ajouter une page </span>
+            </a>
+          </li>
           <li class="sidebar-item">
             <a
               href="#"
@@ -154,18 +180,29 @@ function Sidebar() {
               class="sidebar-dropdown list-unstyled collapse"
               data-bs-parent="#sidebar"
             >
-          
-          {pages.map(page => (
-        <li key={page.id} className="sidebar-item">
-            <a href="#" className="sidebar-link">
-                <span className="icon-mini-menu">{page.page_name.charAt(0)}</span>
-                {page.page_name}
-                <MdOutlineDeleteOutline onClick={() => deletepage(page.id)} size={20} className="ms-5" cursor={'pointer'}/>
+              {pages.map((page) => (
+                <li key={page.id} className="sidebar-item">
+                  <a href="#" className="sidebar-link">
+                    <span className="icon-mini-menu">
+                      {page.page_name.charAt(0)}
+                    </span>
+                    {page.page_name}
 
-            </a>
-            
-        </li>
-    ))}
+                    <ConfirmModal
+                      isOpen={isModalOpen}
+                      message="Are you sure you want to proceed?"
+                      onConfirm={() => deletepage(page.id)}
+                      onCancel={handleCloseModal}
+                    />
+                    <MdOutlineDeleteOutline
+                      onClick={handleOpenModal}
+                      size={20}
+                      className="ms-5"
+                      cursor={"pointer"}
+                    />
+                  </a>
+                </li>
+              ))}
             </ul>
           </li>
 
@@ -206,18 +243,15 @@ function Sidebar() {
               data-bs-target="#multi"
               aria-expanded="false"
               aria-controls="multi"
-        
             >
-              <IoLogoLinkedin size={20} color="blue"  />
+              <IoLogoLinkedin size={20} color="blue" />
               <span>Linkedin</span>
             </a>
             <ul
               id="multi"
               class="sidebar-dropdown list-unstyled collapse"
               data-bs-parent="#sidebar"
-            >
-            
-            </ul>
+            ></ul>
           </li>
         </ul>
         <div class="sidebar-footer">
@@ -227,47 +261,45 @@ function Sidebar() {
           </a>
         </div>
         {showpopup && (
-            <div className="popup">
-              <div className="popup-content">
-                <button className="close-button" onClick={togglePopup}>
-                  ×
-                </button>
+          <div className="popup">
+            <div className="popup-content">
+              <button className="close-button" onClick={togglePopup}>
+                ×
+              </button>
 
-                <div className="input-list">
+              <div className="input-list">
                 <div className="page-input ">
-                <label name="email">Nom du page</label>
-                    <input type="text"
-                    
+                  <label name="email">Nom du page</label>
+                  <input
+                    type="text"
                     onChange={(event) => setNomPage(event.target.value)}
-
-                     />
-                    </div>
-                    <div className="page-input">
-                <label name="email">Pga id</label>
-                    <input type="text"
-                    
+                  />
+                </div>
+                <div className="page-input">
+                  <label name="email">Pga id</label>
+                  <input
+                    type="text"
                     onChange={(event) => setPageId(event.target.value)}
-
-                     />
-                    </div>
-                    <div className="page-input">
-                <label name="email">Access token</label>
-                    <input type="text"
-                    
+                  />
+                </div>
+                <div className="page-input">
+                  <label name="email">Access token</label>
+                  <input
+                    type="text"
                     onChange={(event) => setAccessToken(event.target.value)}
-
-                     />
-                    </div>
-                    <div className="ajouter-button">
-                <button onClick={add} >Ajouter</button>
-            </div>
+                  />
+                </div>
+                <div className="ajouter-button">
+                  <button onClick={add}>Ajouter</button>
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
       </aside>
-  </>
- )
+      <ToastContainer />
+    </>
+  );
 }
 
-export default Sidebar
+export default Sidebar;

@@ -5,6 +5,7 @@ import axios from "axios";
 import * as actionTypes from '../reducers/actionTypes'
 import {  useNavigate } from 'react-router-dom'
 import { connect, useDispatch, useSelector } from "react-redux";
+import { ToastContainer,toast } from "react-toastify";
 
 const Register = () => {
   const navigate=useNavigate()
@@ -14,11 +15,23 @@ const Register = () => {
   const [Tel, setTelephone] = useState("");
 
   const [socite, setSocite] = useState("");
+  
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const register = async (e) => {
     e.preventDefault();
+    if(password!=confirmPassword){
+      toast.error('Mot de passe non valid.');
+
+    }
+    if(name.trim()==""||email.trim()==""||Tel.trim()==""||socite.trim()==""||password.trim()==""){
+      toast.error('verifier vos données .');
+
+    }
+    else{
+
 
     const formData = new FormData();
     formData.append("name", name);
@@ -42,11 +55,13 @@ const Register = () => {
         type: actionTypes.LOGIN_SUCCESS,
         user: formData
       });
-      navigate('/calendar')
+      navigate('/login')
       console.log("response", response);
     } catch (err) {
-      console.log(err);
-    }
+      console.log('eroor')
+      toast.error("verifier vos données .",err);
+
+    }    }
   };
 
   return (
@@ -88,7 +103,7 @@ const Register = () => {
               <div className="register-input">
                 <label name="email">Email</label>
                 <input
-                  type="text"
+                  type="email"
                   placeholder="Nom@email.com"
                   onChange={(event) => setEmail(event.target.value)}
                 />
@@ -111,7 +126,7 @@ const Register = () => {
               </div>
               <div className="register-input">
                 <label name="confirm-password">Confirmer mot de passe</label>
-                <input type="password" />
+                <input type="password"        onChange={(event) => setConfirmPassword(event.target.value)}/>
               </div>
               <div className="password-exclamation">
                 <svg
@@ -141,6 +156,7 @@ const Register = () => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </>
   );
 };

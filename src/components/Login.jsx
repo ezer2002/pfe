@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { connect, useDispatch, useSelector } from "react-redux";
 import * as actionTypes from '../reducers/actionTypes'
+import { ToastContainer,toast } from "react-toastify";
+
 const Login = () => {
   const navigate=useNavigate()
   const [email, setEmail] = useState("");
@@ -34,13 +36,15 @@ const Login = () => {
       );
       dispatch({
         type: actionTypes.LOGIN_SUCCESS,
-        user: formData
+        user: response.data.id,
       });
-      navigate('/calendar')
-
       console.log("response", response);
+
     } catch (err) {
       console.log(err);
+
+      toast.error('verifier vos données .');
+
     }
   };
 
@@ -104,7 +108,8 @@ const Login = () => {
             </div>
         </div>
     </div>
-            </div> 
+            </div>       <ToastContainer />
+
             </div>
   )
 }
