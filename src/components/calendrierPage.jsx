@@ -16,6 +16,7 @@ import { FaFileImage } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { connect, useDispatch, useSelector } from "react-redux";
 
 const localizer = momentLocalizer(moment);
 
@@ -79,7 +80,8 @@ export default function Calenderpage() {
   const handleEventClick = (eventId) => {
     navigate(`/post/${eventId}`); // Navigation vers la page du post avec l'ID de l'événement
   };
-  
+  const userData = useSelector((data) => data.user);
+
 
   const toggleEventPopup = () => {
     setshoweventpopup(!showeventpopup);
@@ -197,7 +199,7 @@ export default function Calenderpage() {
   // Chargement des événements depuis le backend
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/events")
+      .get("http://127.0.0.1:8000/api/events",{ params: { userId: userData } })
       .then((response) => {
         console.log("events", response);
         const formattedEvents = response.data.map((event) => ({

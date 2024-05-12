@@ -36,6 +36,7 @@ import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import ConfirmModal from "./Navigation/modal";
 import { connect, useDispatch, useSelector } from "react-redux";
+import {  useNavigate } from 'react-router-dom'
 
 function Home() {
   const location = useLocation();
@@ -91,7 +92,7 @@ function Home() {
     try {
       const response = await axios.get("http://127.0.0.1:8000/api/getUserPages", {
                     params: {
-                        user_id: userData
+                        user_id: 1
                     }
                 });      setPages(response.data);
       console.log("page",response.data);
@@ -101,7 +102,7 @@ function Home() {
   };
   useEffect(() => {
     get()
-  }, )
+  },[] )
   
   useEffect(() => {
     
@@ -199,10 +200,69 @@ function Home() {
     setselectedFiles(updatedSelectedFiles);
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const update =async () => {
+   
+    /*const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
+    axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;*/
 
+    const formData = new FormData();
+    formData.append("message", text);
+    formData.append("page_id", "115449061452354");
+    formData.append("media_path", image ?? videoFile);
+    formData.append("social_id", selectedValue);
+    formData.append("id", 20);
+
+    
+    /*if (image) {
+      formData.append("media_path", image, image.name);
+    }
+    if (videoFile) {
+        formData.append("media_path", videoFile, videoFile.name);
+    }*/
+
+    selectedFiles.forEach((media, index) => {
+      formData.append(`media_paths[${index}]`, media.file);
+    });
+    /*selectedFiles.forEach((file, index) => {
+      formData.append(`media_paths[${index}]`, file, file.name);
+    });*/
+
+    ///*******+++********* */
+    // const filePathsJson = '["uploads\\/post\\/17105958680.jpg","uploads\\/post\\/17105958682.jpg","uploads\\/post\\/17105958683.webp"]';
+    // const filePathsArray = JSON.parse(filePathsJson);
+    // const cleanedFilePathsArray = filePathsArray.map(path => path.replace(/\\/g, ''));
+    // console.log("clean")
+    // console.log(cleanedFilePathsArray);
+
+    try {
+      setLoadingPublish(true);
+      const response = await axios.put(
+        "http://127.0.0.1:8000/api/modify-post",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setLoadingPublish(false);
+      toast.success("Post published successfully.");
+      setText();
+      setImage(null);
+      setImageLocale(null);
+      setselectedFiles([]);
+
+      setColumns([]);
+    } catch (err) {
+      setLoadingPublish(false);
+      toast.success("An error occurred.");
+      console.log(err);
+    }
+  };
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
+  const navigate=useNavigate()
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -210,7 +270,7 @@ function Home() {
 
   const handleConfirm = () => {
     // Handle confirmation logic here
-    console.log('Confirmed');
+    deletepost()
     setIsModalOpen(false);
   };
   const handleFileChange = (e) => {
@@ -308,6 +368,32 @@ function Home() {
     setColumns([col1, col2]);
   }, [selectedFiles]);
 
+  const deletepost = async () => {
+  
+
+    try {
+      
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/delete-post",
+        {id:data.id},
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+  
+      toast.success("Post deleted successfully.");
+      navigate('/calendar')
+
+
+  
+    } catch (err) {
+   
+      toast.success("An error occurred.");
+      console.log(err);
+    }
+  };
   const publishPost = async (e) => {
     e.preventDefault();
 
@@ -373,7 +459,7 @@ function Home() {
 
     const formData = new FormData();
     formData.append("message", text);
-    formData.append("page_id", "115449061452354");
+    
     formData.append("media_path", image ?? videoFile);
     formData.append(
       "scheduled_datetime",
@@ -383,6 +469,7 @@ function Home() {
     selectedFiles.forEach((media, index) => {
       formData.append(`media_paths[${index}]`, media.file);
     });
+    formData.append("social_id", selectedValue);
 
     try {
       setLoadingProgram(true);
@@ -419,12 +506,15 @@ function Home() {
 
     const formData = new FormData();
     formData.append("message", text);
-    formData.append("page_id", "115449061452354");
     formData.append("media_path", image ?? videoFile);
+    formData.append("social_id", selectedValue);
 
     selectedFiles.forEach((media, index) => {
       formData.append(`media_paths[${index}]`, media.file);
     });
+    if(selectedValue.trim()==''){
+      toast.error('add page')
+    }
     try {
       setLoadingDraft(true);
       const response = await axios.post(
@@ -443,6 +533,8 @@ function Home() {
       setImageLocale(null);
       setColumns([]);
     } catch (err) {
+      setLoadingDraft(false);
+
       toast.error("An error occurred while saving as draft.");
       console.log(err);
     }
@@ -935,7 +1027,7 @@ function Home() {
            <div>
         {data && data.subtitle === "saved as draft" && <div className="delete-container">
           
-          
+          <div style={{display:"flex"}}>
         <button
                           className="ms-3 buttons delete d-flex align-items-center"
                           onClick={handleOpenModal} 
@@ -946,6 +1038,16 @@ function Home() {
                           />
                           Delete
                         </button>
+                        <button
+                          className="ms-3 buttons  d-flex align-items-center"
+                          onClick={update} 
+                        >
+                          {/* <MdOutlineDeleteOutline
+                            style={{ color: "white" }}
+                            className="mx-1"
+                          /> */}
+                          Update
+                        </button></div>
           
           </div>}
       </div>
