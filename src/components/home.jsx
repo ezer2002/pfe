@@ -407,14 +407,35 @@ function Home() {
     }
     setIsActive(!isActive);
   };
-
+  
   const recognition = new window.webkitSpeechRecognition();
+  recognition.interimResults = true;
+  recognition.continuous = true;
   
   const handleVoiceToText = () => {
-    recognition.interimResults = true;
-    recognition.continuous = true; // Continue à écouter même après des pauses courtes
+    const recognition = new window.webkitSpeechRecognition();
+  recognition.interimResults = true;
+  recognition.continuous = true;
+    // If already recording, reset everything and stop the current recording
+    if (isRecording) {
+      recognition.stop(); 
+      setIsRecording(false);
+      stopRecording();
+      setIsActive(false);
+      stopTimer();
+      setText("");
+    } else {
+      // Reset states before starting a new session
+      setText("");
+      setSecond("00");
+      setMinute("00");
+      setCounter(0);
+      setIsActive(true);
+      startRecording();
+      setIsRecording(true);
+      recognition.start();
+    }
   
-      
     recognition.onresult = (e) => {
       let transcript = '';
       for (const result of e.results) {
@@ -423,34 +444,30 @@ function Home() {
       setText(transcript);
     };
   
-    recognition.onend = () => {
-      // Optionnel: redémarrer la reconnaissance si nécessaire
-      if (!recognition.aborted) {
-        recognition.start();
-      } 
+    recognition.onerror = (event) => {
+      console.error("Voice recognition error: ", event.error);
     };
   
-    recognition.onerror = (event) => {
-      // Gérez ici les erreurs.
-      console.error("Voice recognition error. ", event.error);
+    recognition.onend = () => {
+      // Automatically restart recognition unless it has been explicitly stopped
+      if (isRecording) {
+        recognition.start();
+      }
     };
-    
-    if (!isRecording) {
-      // Commencer l'enregistrement vocal
-      recognition.start();
-      setIsRecording(true);
-    }
-    // 
-
   };
-
+  
   const stopTranscription = () => {
     if (isRecording) {
-      // Arrêter l'enregistrement vocal
-      recognition.abort();
-      setIsRecording(false);
+      recognition.stop(); // Arrêter la reconnaissance vocale
+      recognition.onresult = null; // Retirer le gestionnaire de résultat pour arrêter l'écriture dans setText
+      stopRecording(); // S'assurer que l'enregistrement audio est également arrêté
+      setIsRecording(false); // Mettre à jour l'état pour refléter que l'enregistrement est terminé
+      setIsActive(false); // Désactiver l'état actif
+      stopTimer(); // Arrêter le compteur
     }
-  }
+  };
+
+  
 
   
 
@@ -640,7 +657,7 @@ function Home() {
                         onClick={publishPost}
                       >
                         <FiSend className="mx-1" />
-                        Publier
+                        publish
                       </button>
                     )}
                 </form>
