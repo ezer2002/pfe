@@ -15,8 +15,16 @@ import Sidebar from "./Navigation/sidebar";
 import { FaFileImage } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { FaRegEdit } from "react-icons/fa";
+import { MdOutlineDeleteOutline } from "react-icons/md";
+import { connect, useDispatch, useSelector } from "react-redux";
+import ConfirmModal from "./Navigation/modal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const localizer = momentLocalizer(moment);
+
+
+
 
 /*const EventComponent = ({ event }) => (
     <div>
@@ -32,17 +40,13 @@ const EventComponent = ({ event, onEventClick }) => (
     <div className="event-sub-title">
       {event.subtitle}
       <FaFileImage color={event.color} />
-      {event.subtitle === "programmed" && <FaFileImage color={event.color} />}
-      {event.subtitle === "Meta Business Suite" && (
-        <FaSquareFacebook color={event.color} />
-      )}
-      {event.subtitle === "Meta Business Suite_Programmer" && (
-        <IoLogoLinkedin color={event.color} />
-      )}
+      
     </div>
     <button onClick={() => onEventClick(event.id)}>Voir plus</button>
   </div>
 );
+
+
 
 const MoreEventsPopup = ({ events }) => {
   // Logique pour ordonner les événements par heure
@@ -65,6 +69,13 @@ const MoreEventsPopup = ({ events }) => {
 };
 
 export default function Calenderpage() {
+
+  const [showeventpopup, setshoweventpopup] = useState(false);
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [eventselected, seteventselected] = useState();
+
   const [showpopup, setshowpopup] = useState(false);
   const [eventsDays, seteventsDays] = useState();
   const navigate = useNavigate();
@@ -72,9 +83,24 @@ export default function Calenderpage() {
   const handleEventClick = (eventId) => {
     navigate(`/post/${eventId}`); // Navigation vers la page du post avec l'ID de l'événement
   };
+  const userData = useSelector((data) => data.user);
 
+
+  const toggleEventPopup = () => {
+    setshoweventpopup(!showeventpopup);
+  };
   const togglePopup = () => {
     setshowpopup(!showpopup);
+  };
+  const handleeventClick = (event) => {
+    
+    navigate(`/edit/${encodeURIComponent(
+      JSON.stringify(event)
+    )}`); // Navigation vers la page du post avec l'ID de l'événement
+
+    // setshoweventpopup(!showeventpopup)
+    // seteventselected(event)
+    console.log(event);
   };
   const handleClick = (events) => {
     setshowpopup(true);
@@ -124,6 +150,34 @@ export default function Calenderpage() {
     </div>
   );
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const deletepost = async () => {
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/delete-post",
+        { item: eventsDays.item},
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      toast.success("Post deleted successfully.");
+      navigate("/calendar");
+    } catch (err) {
+      toast.success("An error occurred.");
+      console.log(err);
+    }
+  };
+
   const CustomDateCellWrapper = ({ children, value, events }) => {
     const [showAllEvents, setShowAllEvents] = useState(false);
 
@@ -137,7 +191,9 @@ export default function Calenderpage() {
         {showAllEvents ? (
           <div>
             {events.map((event) => (
-              <div key={event.id}>{event.title}</div>
+              <div key={event.id}>{event.title 
+              } </div>
+              
             ))}
             <button onClick={toggleShowAllEvents}>Moins</button>
           </div>
@@ -176,7 +232,7 @@ export default function Calenderpage() {
   // Chargement des événements depuis le backend
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/events")
+      .get("http://127.0.0.1:8000/api/events",{ params: { userId: userData } })
       .then((response) => {
         console.log("events", response);
         const formattedEvents = response.data.map((event) => ({
@@ -208,6 +264,8 @@ export default function Calenderpage() {
         console.log(error);
       });
   }, []);
+
+  
 
   // Fonction pour obtenir la couleur en fonction du type de publication
   // const getColorBasedOnType = (type) => {
@@ -256,7 +314,7 @@ export default function Calenderpage() {
                   borderRadius: "0",
                   backgroundColor: "#f8f9fa",
                   borderLeft: `3px solid ${event.color}`,
-                  color: "#fff",
+                 
                 },
               })}
               views={[Views.MONTH, Views.WEEK]}
@@ -280,7 +338,22 @@ export default function Calenderpage() {
               onShowMore={(events, date) => handleClick(events)}
               onSelectSlot={handleSelectSlot}
               onSelecting={handleClick}
+              onSelectEvent={handleeventClick}
             />
+            <div className="legend">
+              <div className="legend-item">
+                <FaFileImage color="blue" />
+                <span>Post saved as draft</span>
+              </div>
+              <div className="legend-item">
+                <FaFileImage color="green" />
+                <span>Post published</span>
+              </div>
+              <div className="legend-item">
+                <FaFileImage color="orange" />
+                <span>Post scheduled for publication</span>
+              </div>
+            </div>
           </div>
           {showpopup && (
             <div className="popup">
@@ -311,16 +384,37 @@ export default function Calenderpage() {
                             {item.title}
                           </h3>
                         </div>
-                        <div>
-                          {" "}
-                          <Link
-                            to={`/edit/${encodeURIComponent(
-                              JSON.stringify(item)
-                            )}`}
-                          >
-                            <FaRegEdit />
-                          </Link>
+                        <div className={item.subtitle ==="saved as draft" ?"icons":"icons disabled"}>
+
+                          <div>
+                            {" "}
+                            <Link
+                              to={`/edit/${encodeURIComponent(
+                                JSON.stringify(item)
+                              )}`}
+                            >
+                              <FaRegEdit size={20} />
+                            </Link>
+                          </div>
+                          <div>
+                           
+
+                              <MdOutlineDeleteOutline 
+                                onClick={handleOpenModal}
+                                color="red"
+                                size={20}
+                                cursor="pointer"
+                              />
+                              
+                              
+                          </div>   
                         </div>
+                        <ConfirmModal
+                              isOpen={isModalOpen}
+                              message="Are you sure you want to proceed?"
+                              onConfirm={() => deletepost(item.id)}
+                              onCancel={handleCloseModal}
+                            />
                       </div>
                       <div className="event-sub-title">
                         <p>
@@ -333,16 +427,30 @@ export default function Calenderpage() {
                           </span>
                           {/* <FaFileImage color={item.color} /> */}
                           {item.subtitle === "programmed" && (
-                            <FaFileImage color={item.color} />
+                            <Link
+                            to={`/edit/${encodeURIComponent(
+                              JSON.stringify(item)
+                            )}`}
+                          >
+                            <FaFileImage color={item.color} />   </Link>
                           )}{" "}
                           {/* Icône pour événement programmé */}
                           {item.subtitle === "published" && (
-                            <FaSquareFacebook color={item.color} />
+                            <Link
+                            to={`/edit/${encodeURIComponent(
+                              JSON.stringify(item)
+                            )}`}
+                          >
+                            <FaFileImage color={item.color} /></Link>
                           )}{" "}
                           {/* Icône pour Meta Business Suite */}
                           {item.subtitle ===
                             "saved as draft" && (
-                            <IoLogoLinkedin color={item.color} />
+                              <Link
+                            to={`/edit/${encodeURIComponent(
+                              JSON.stringify(item)
+                            )}`}
+                          >  <FaFileImage color={item.color} /></Link>
                           )}{" "}
                         </p>
                         {/* Icône pour Meta Business Suite Programmer */}
@@ -353,8 +461,11 @@ export default function Calenderpage() {
               </div>
             </div>
           )}
+           
         </div>
       </div>
+      
+      <ToastContainer />
     </div>
   );
 }

@@ -1,0 +1,15 @@
+/* styles.css */
+.custom-button {
+    font-size: 16px; /* Définissez la taille de la police selon vos besoins */
+    /* Autres styles personnalisés pour le bouton */
+}
+.p-dialog-draggable .p-dialog-header {
+    cursor: move;
+}
+.p-button-label{
+    margin-inline: 12px;
+}
+.p-confirm-dialog-reject{
+    margin-top: 10px;
+    margin-inline: 12px;
+}

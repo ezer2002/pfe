@@ -3,8 +3,8 @@ import { FaBars } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { IoSearch } from "react-icons/io5";
-import profil from "../../assets/images/Innovation page.png";
-import profil2 from "../../assets/images/Innovation page.png";
+import profil from "../../assets/images/profil.jpg";   
+
 import "../../styles/navbar.css";
 import { connect, useDispatch, useSelector } from "react-redux";
 import * as actionTypes from "../../reducers/actionTypes";
@@ -38,16 +38,7 @@ function Navbar() {
           onClick={() => setMobile(false)}
           className={Mobile ? "nav-links-mobile" : "nav-links "}
         >
-          <li class={selected ? "nav-item menu  " : "nav-item selected"}>
-            <div class=" profile-pic">
-              <li>Schedule</li>
-            </div>
-          </li>
-          <li class="nav-item menu ">
-            <div class=" profile-pic">
-              <li>List</li>
-            </div>
-          </li>
+          
         </div>
         <div
           onClick={() => setMobile(false)}
@@ -64,7 +55,7 @@ function Navbar() {
             <div class=" profile-pic">
               {" "}
               <img src={profil} alt="user-img" class="img-circle" />
-              <span>Beya Marzouk</span> <MdOutlineKeyboardArrowDown />
+              <span>Ezer Abrougui</span> <MdOutlineKeyboardArrowDown />
             </div>
             <ul
               class={clicked ? "dropdown-menu dropdown-user" : "dropdown-menu "}

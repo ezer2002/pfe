@@ -582,7 +582,96 @@ right: 1px; /* Adjust right position */
   background-color: #2196F3; /* Bleu pour indiquer l'enregistrement actif */
 }
 
-.titleeditsection{
+.voice-control {
+  padding-top: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.voice-button button {
+  background: none;
+  border: 2px gray; /* Exemple de couleur */
+  border-radius: 50%;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 10px;
+  color: gray; /* Assorti à la bordure */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.voice-button button:hover {
+  background-color: #4CAF50; /* Couleur au survol */
+  color: white;
+}
+
+.timer {
+  font-size: 14px;
+  margin-top: 5px;
+  color: #333; /* Couleur du texte pour la lisibilité */
+}
+
+.minute, .second {
+  font-weight: bold;
+}
+
+.buttons.delete{
+  background-color: red;
+  border-radius: 5px;
+  border: 1px solid rgb(156, 156, 156);
+  padding-inline: 12px;
+  font-weight: 600;
+  padding-block: 4px;
+  color: white;
+  margin: auto;
+ }
+ .delete-container{
+  margin: auto;
+  width: 50%;
+
+ }
+
+ .titleeditsection{
   display: flex;
   justify-content: space-between;
+}
+
+.icons{
+  display: flex;
+}
+
+.icons.disabled{
+  display: flex;
+  pointer-events: none; /* Empêche les événements de la souris */
+  opacity: 0.5; /* Réduit l'opacité pour indiquer visuellement que le bouton est désactivé */
+  cursor: not-allowed; 
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  font-size: 16px;
+}
+
+.legend-item span {
+  margin-left: 5px;
+}
+
+.legend-item:first-child {
+  color: blue;
+}
+
+.legend-item:nth-child(2) {
+  color: green;
+}
+
+.legend-item:last-child {
+  color: orange;
 }
