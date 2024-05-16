@@ -3,15 +3,16 @@ import { FaBars } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { IoSearch } from "react-icons/io5";
-import profil from "../../assets/images/profil.jpg";   
+import profil from "../../assets/images/profil.jpg";
 
 import "../../styles/navbar.css";
 import { connect, useDispatch, useSelector } from "react-redux";
 import * as actionTypes from "../../reducers/actionTypes";
 import { Navigate } from "react-router-dom";
 import { Link, useNavigate } from "react-router-dom";
+import { SlCalender } from "react-icons/sl";
 
-function Navbar() {
+function Navbar({home}) {
   const [Mobile, setMobile] = useState(false);
   const [selected, setSelected] = useState(false);
   const [clicked, setClicked] = useState(false);
@@ -20,8 +21,11 @@ function Navbar() {
   const userData = useSelector((data) => data.user);
 
   const handleClick = () => {
+    console.log("click");
     setClicked(!clicked);
   };
+  const navigatetohome =()=>{
+    navigate('/calendar')}
   const logout = () => {
     dispatch({
       type: actionTypes.logout_SUCCESS,
@@ -33,20 +37,25 @@ function Navbar() {
 
   return (
     <nav className="navbar">
+  
+
       <div className="navbar-items">
+   {  home&& <div className="retour-home">
+        <SlCalender size={20} color="black" onClick={navigatetohome} style={{cursor:"pointer"}} />
+
+        </div>}
         <div
           onClick={() => setMobile(false)}
           className={Mobile ? "nav-links-mobile" : "nav-links "}
-        >
-          
-        </div>
+        ></div>
+      
         <div
           onClick={() => setMobile(false)}
           className={Mobile ? "nav-links-mobile" : "nav-links user"}
         >
-          <div className="search-icon">
+          {/* <div className="search-icon">
             <IoSearch size={25} />
-          </div>
+          </div> */}
           <li
             class="nav-item dropdown"
             onClick={handleClick}

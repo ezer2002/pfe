@@ -3,7 +3,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { FaSquareFacebook } from "react-icons/fa6";
 import { BsInstagram } from "react-icons/bs";
 import { IoLogoLinkedin } from "react-icons/io5";
-import logo from "../../assets/images/diggow.jpg"; 
+import logo from "../../assets/images/diggow.jpg";
 import { SlCalender } from "react-icons/sl";
 import "../../styles/sidebar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -54,7 +54,7 @@ function Sidebar() {
             page_id: pageId,
 
             access_token: accessToken,
-            user_id:userData
+            user_id: userData,
           }
         );
 
@@ -68,15 +68,18 @@ function Sidebar() {
     }
   };
 
-
   const get = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/getUserPages", {
-                    params: {
-                        user_id: userData
-                    }
-                });      setPages(response.data);
-      console.log("page",response.data);
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/getUserPages",
+        {
+          params: {
+            user_id: userData,
+          },
+        }
+      );
+      setPages(response.data);
+      console.log("page", response.data);
     } catch (err) {
       console.log("err");
     }
@@ -86,8 +89,10 @@ function Sidebar() {
   }, []);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deletedpage, setdeletedpage] = useState('');
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (id) => {
+    setdeletedpage(id)
     setIsModalOpen(true);
   };
 
@@ -95,49 +100,27 @@ function Sidebar() {
     setIsModalOpen(false);
   };
 
-
   const clicke = (id) => {
-    console.log("haaaaaaaaaaaaaaaay")
+    console.log("haaaaaaaaaaaaaaaay");
   };
 
   const deletethepage = (id) => {
     console.log(id);
     axios
-      .post(`http://127.0.0.1:8000/api/pages/${id}/delete` )
+      .post(`http://127.0.0.1:8000/api/pages/${id}/delete`)
       .then((response) => {
         console.log(response.data.message);
-       get()
-       toast.success("page deleted successfully.");
-       setIsModalOpen(false);
+        get();
+        toast.success("page deleted successfully.");
+        setIsModalOpen(false);
       })
-      
 
       .catch((error) => {
-        toast.error('Error deleting page existing post for this page')
+        toast.error("Error deleting page existing post for this page");
         console.error("Error deleting page:", error);
         setIsModalOpen(false);
       });
-
   };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   return (
     <>
@@ -155,12 +138,6 @@ function Sidebar() {
             </div>
           </li>
         </ul>
-        <div class="sidebar-footer">
-          <a href="#" class="sidebar-link">
-            <i class="lni lni-exit"></i>
-            <span>Logout</span>
-          </a>
-        </div>
       </aside>
 
       <aside id="sidebar" className={expanded ? "expand" : ""}>
@@ -210,28 +187,27 @@ function Sidebar() {
             >
               {pages.map((page) => (
                 <li key={page.id} className="sidebar-item">
-                  <a href="#" className="sidebar-link">
-                    <span className="icon-mini-menu">
+                  <a href="#" className="sidebar-link page-name">
+                    {/* <span className="icon-mini-menu">
                       {page.page_name.charAt(0)}
-                    </span>
-                    {page.page_name}
-                    <ConfirmModal
-                    isOpen={isModalOpen}
-                    message="Are you sure you want to proceed?"
-                    onConfirm={() => deletethepage(page.id)}
-                    onCancel={handleCloseModal}
-                  />
+                    </span> */}
+                    <div className="name">{page.page_name}</div>
 
-                   
+                    {/* <div className="delete-page">
+                      <ConfirmModal
+                        isOpen={isModalOpen}
+                        message="Are you sure you want to proceed?"
+                        onConfirm={() => }
+                        onCancel={handleCloseModal}
+                      />
+                    </div> */}
+                    <MdOutlineDeleteOutline
+                                        onClick={() => handleOpenModal(page.id)}
 
-                      <MdOutlineDeleteOutline
-                      onClick={handleOpenModal}
-               
                       size={20}
                       className="ms-5"
                       cursor={"pointer"}
                     />
-                  
                   </a>
                 </li>
               ))}
@@ -254,9 +230,7 @@ function Sidebar() {
               id="auth"
               class="sidebar-dropdown list-unstyled collapse"
               data-bs-parent="#sidebar"
-            >
-              
-            </ul>
+            ></ul>
           </li>
           <li class="sidebar-item">
             <a
@@ -291,7 +265,6 @@ function Sidebar() {
               </button>
 
               <div className="input-list">
-               
                 <div className="page-input">
                   <label name="email">Page id</label>
                   <input
@@ -314,7 +287,44 @@ function Sidebar() {
           </div>
         )}
       </aside>
-      
+    {isModalOpen &&  <div className="popup">
+        <div className="popup-content">
+          <button className="close-button" onClick={togglePopup}>
+            ×
+          </button>
+          <div>
+            <h5>Are you sure you want to proceed?</h5>
+
+            <div
+              style={{ margin: "8px", display: "flex", justifyContent: "end" }}
+            >
+              <button
+            onClick={() => deletethepage(deletedpage)}
+
+                style={{
+                  background: "red",
+                  color: "white",
+                  padding: "5px",
+                  margin: "5px",
+                }}
+              >
+                Confirm
+              </button>
+              <button
+                style={{
+                  background: "green",
+                  color: "white",
+                  padding: "5px",
+                  margin: "5px",
+                }}
+                onClick={handleCloseModal}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>}
       <ToastContainer />
     </>
   );

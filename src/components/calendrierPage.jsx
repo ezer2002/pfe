@@ -135,6 +135,17 @@ export default function Calenderpage() {
   const [events, setEvents] = useState([]);
   const [showMorePopup, setShowMorePopup] = useState(false);
   const [moreEvents, setMoreEvents] = useState([]);
+  useEffect(() => {
+    // sal();
+
+    document.addEventListener("click", handleOutsideClick);
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, []);
+  const handleOutsideClick = (event) => {
+    setshowpopup(false)
+  };
 
   // Function to handle navigation to the Home component
   const navigateToHome = () => {
@@ -148,9 +159,11 @@ export default function Calenderpage() {
         </div>
       ))}
     </div>
-  );
+);
+const [deletedpost, setdeletedpost] = useState("");
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (id) => {
+    setdeletedpost(id)
     setIsModalOpen(true);
   };
 
@@ -162,14 +175,14 @@ export default function Calenderpage() {
     try {
       const response = await axios.post(
         "http://127.0.0.1:8000/api/delete-post",
-        { item: eventsDays.item},
+        { id: deletedpost },
         {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         }
       );
-
+      setIsModalOpen(false)
       toast.success("Post deleted successfully.");
       navigate("/calendar");
     } catch (err) {
@@ -237,7 +250,7 @@ export default function Calenderpage() {
         console.log("events", response);
         const formattedEvents = response.data.map((event) => ({
           ...event,
-          title: event.page_name,
+          title: `${event.page_name}`,
           start:
             event.Programming_options === "published"
               ? new Date(event.created_at)
@@ -289,7 +302,7 @@ export default function Calenderpage() {
         <Sidebar />
 
         <div class="main ">
-          <Navbar />
+          <Navbar home={false}/>
           <div class="container-fluid">
             <div className="container-row">
               <button className="add-new" onClick={navigateToHome}>
@@ -400,7 +413,8 @@ export default function Calenderpage() {
                            
 
                               <MdOutlineDeleteOutline 
-                                onClick={handleOpenModal}
+                                  onClick={() => handleOpenModal(item.id)}
+                            
                                 color="red"
                                 size={20}
                                 cursor="pointer"
@@ -409,12 +423,7 @@ export default function Calenderpage() {
                               
                           </div>   
                         </div>
-                        <ConfirmModal
-                              isOpen={isModalOpen}
-                              message="Are you sure you want to proceed?"
-                              onConfirm={() => deletepost(item.id)}
-                              onCancel={handleCloseModal}
-                            />
+              
                       </div>
                       <div className="event-sub-title">
                         <p>
@@ -464,7 +473,44 @@ export default function Calenderpage() {
            
         </div>
       </div>
-      
+      {isModalOpen &&  <div className="popup">
+        <div className="popup-content">
+          <button className="close-button" onClick={togglePopup}>
+            ×
+          </button>
+          <div>
+            <h5>Are you sure you want to proceed?</h5>
+
+            <div
+              style={{ margin: "8px", display: "flex", justifyContent: "end" }}
+            >
+              <button
+            onClick={() => deletepost(deletedpost)}
+
+                style={{
+                  background: "red",
+                  color: "white",
+                  padding: "5px",
+                  margin: "5px",
+                }}
+              >
+                Confirm
+              </button>
+              <button
+                style={{
+                  background: "green",
+                  color: "white",
+                  padding: "5px",
+                  margin: "5px",
+                }}
+                onClick={handleCloseModal}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>}
       <ToastContainer />
     </div>
   );
