@@ -92,11 +92,17 @@ function Home() {
 
   useEffect(() => {
     if (data && data.media_path) {
-      if (data.media_path.endsWith("mp4")) {
-        setVideoFile(`http://127.0.0.1:8000/${data.media_path}`);
-      } else {
-        setImageLocale(`http://127.0.0.1:8000/${data.media_path}`);
+      if( data.media_path!='null'){
+        console.log("the media pathh",data.media_path)
+        if (data.media_path.endsWith("mp4")) {
+          setVideoFile(`http://127.0.0.1:8000/${data.media_path}`);
+        } else {
+          setImageLocale(`http://127.0.0.1:8000/${data.media_path}`);
+          setImage(`${data.media_path}`);
+  
+        }
       }
+     
     }
 
     // console.log("hello",data.media_paths)
@@ -182,7 +188,7 @@ function Home() {
     startRecording,
     stopRecording,
     pauseRecording,
-    mediaBlobUrl,
+ 
   } = useReactMediaRecorder({
     video: false,
     audio: true,
@@ -250,9 +256,10 @@ function Home() {
     const formData = new FormData();
     formData.append("message", text);
 
-    console.log(videoFile);
 
-    console.log(image);
+
+    console.log('from function',image);
+ 
     formData.append("media_path", image ? image : videoFile);
     formData.append("idpage", selectedValue);
     formData.append("id", data.id);
@@ -497,12 +504,15 @@ function Home() {
   };
 
   const handleDeleteMedia = (index) => {
+console.log(index)
+
     const updatedFiles = [...selectedFiles];
     //const updatedFiles = selectedFiles.filter((_, i) => i !== index);
     updatedFiles.splice(index, 1);
     setselectedFiles(updatedFiles);
     setVideoFile(null);
     setImage(null);
+
     setImageLocale(null);
 
     // Si vous êtes en train de supprimer une image
@@ -536,6 +546,7 @@ function Home() {
     const col1 = selectedFiles.slice(0, 2);
     const col2 = selectedFiles.slice(2, 5);
     setColumns([col1, col2]);
+
   }, [selectedFiles]);
 
   const deletepost = async () => {

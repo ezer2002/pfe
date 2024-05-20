@@ -201,3 +201,27 @@ border-bottom: 1px solid black;
     transform: rotate(45deg);
     transition: all .2s ease-out;
 }
+.pages-input{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+}
+.pages-input label{
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-variation-settings:
+      "slnt" 0;
+}
+.pages-input input {
+    width: 390px;
+    height: 40px;
+    border-radius: 7px;
+    outline: none;
+}
+.input-page-list{
+
+ 
+    width: 100%;
+}
