@@ -89,10 +89,10 @@ function Sidebar() {
   }, []);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [deletedpage, setdeletedpage] = useState('');
+  const [deletedpage, setdeletedpage] = useState("");
 
   const handleOpenModal = (id) => {
-    setdeletedpage(id)
+    setdeletedpage(id);
     setIsModalOpen(true);
   };
 
@@ -101,9 +101,16 @@ function Sidebar() {
   };
 
   const clicke = (id) => {
-    console.log("haaaaaaaaaaaaaaaay");
+  
   };
+  useEffect(() => {
+    // sal();
 
+    document.addEventListener("click", clicke);
+    return () => {
+      document.removeEventListener("click", clicke);
+    };
+  }, []);
   const deletethepage = (id) => {
     console.log(id);
     axios
@@ -202,8 +209,7 @@ function Sidebar() {
                       />
                     </div> */}
                     <MdOutlineDeleteOutline
-                                        onClick={() => handleOpenModal(page.id)}
-
+                      onClick={() => handleOpenModal(page.id)}
                       size={20}
                       className="ms-5"
                       cursor={"pointer"}
@@ -253,19 +259,25 @@ function Sidebar() {
         </ul>
         
         {showpopup && (
-          <div className="popup">
+          <div className="popuppage">
             <div className="popup-content">
               <button className="close-button" onClick={togglePopup}>
                 ×
               </button>
 
-              <div className="input-list">
-                <div className="page-input">
-                  <label name="email">Page id</label>
-                  <input
-                    type="text"
-                    onChange={(event) => setPageId(event.target.value)}
-                  />
+              <div className="input-page-list">
+                <div className="pages-input">
+                  <div>
+                    {" "}
+                    <label name="email">Page id</label>
+                  </div>
+                  <div>
+                    {" "}
+                    <input
+                      type="text"
+                      onChange={(event) => setPageId(event.target.value)}
+                    />
+                  </div>
                 </div>
                 <div className="page-input">
                   <label name="email">Access token</label>
@@ -282,44 +294,49 @@ function Sidebar() {
           </div>
         )}
       </aside>
-    {isModalOpen &&  <div className="popup">
-        <div className="popup-content">
-          <button className="close-button" onClick={togglePopup}>
-            ×
-          </button>
-          <div>
-            <h5>Are you sure you want to proceed?</h5>
+      {isModalOpen && (
+        <div className="popup">
+          <div className="popup-content">
+            <button className="close-button" onClick={togglePopup}>
+              ×
+            </button>
+            <div>
+              <h5>Are you sure you want to proceed?</h5>
 
-            <div
-              style={{ margin: "8px", display: "flex", justifyContent: "end" }}
-            >
-              <button
-            onClick={() => deletethepage(deletedpage)}
-
+              <div
                 style={{
-                  background: "red",
-                  color: "white",
-                  padding: "5px",
-                  margin: "5px",
+                  margin: "8px",
+                  display: "flex",
+                  justifyContent: "end",
                 }}
               >
-                Confirm
-              </button>
-              <button
-                style={{
-                  background: "green",
-                  color: "white",
-                  padding: "5px",
-                  margin: "5px",
-                }}
-                onClick={handleCloseModal}
-              >
-                Cancel
-              </button>
+                <button
+                  onClick={() => deletethepage(deletedpage)}
+                  style={{
+                    background: "red",
+                    color: "white",
+                    padding: "5px",
+                    margin: "5px",
+                  }}
+                >
+                  Confirm
+                </button>
+                <button
+                  style={{
+                    background: "green",
+                    color: "white",
+                    padding: "5px",
+                    margin: "5px",
+                  }}
+                  onClick={handleCloseModal}
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>}
+      )}
       <ToastContainer />
     </>
   );
