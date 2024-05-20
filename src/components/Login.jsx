@@ -5,6 +5,7 @@ import axios from 'axios'
 import { connect, useDispatch, useSelector } from "react-redux";
 import * as actionTypes from '../reducers/actionTypes'
 import { ToastContainer,toast } from "react-toastify";
+import connexion from "../assets/images/connexion.jpg";  
 
 const Login = () => {
   const navigate=useNavigate()
@@ -43,23 +44,16 @@ const Login = () => {
     } catch (err) {
       console.log(err);
 
-      toast.error('verifier vos données .');
-
+      toast.error('Please verify your data.');
     }
   };
-
-
-
-
-
-
 
   return (
     <div className="login">
     <div className="login-container">
         {/* -------------- image --------------------- */}
         <div className="login-img">
-            <img src="https://app.diggow.com/static/media/body_login.014d5cf69aa6a0e24ea4.png" alt="" />
+            <img src={connexion} alt="" />
         </div>
         {/* -------------form--------------------- */}
         <div className="login-all-content">
@@ -69,20 +63,20 @@ const Login = () => {
                     <h3>diggow</h3>
                 </div>
                 <div className="login-welcome">
-                    <h2>Se connecter</h2>
-                    <p>Veuillez saisir vos identifiants afin de vous connecter. Si vous n'étes pas un membre, veuillez créer un compte</p>
+                    <h2>Log in</h2>
+                    <p>Please enter your credentials to log in. If you are not a member, please create an account.</p>
                 </div>
               
                 <div className="login-input">
-                    <label name="email">Email professionnel</label>
+                    <label name="email">Professional emaill</label>
                     <input type="text"
                     
                     onChange={(event) => setEmail(event.target.value)}
 
-                    placeholder='Nom@email.com' />
+                    placeholder='Name@email.com' />
                 </div>
                 <div className="login-input">
-                    <label name="password">Mot de passe</label>
+                    <label name="password">Password</label>
                     <input type="password" 
                     
                     onChange={(event) => setPassword(event.target.value)}
@@ -90,20 +84,14 @@ const Login = () => {
                     />
                   
                 </div>
-            <div className="save-password">
-                <input type="checkbox" checked name="" id="" />
-                <h4>Se souvenir de moi</h4>
-            </div>
-            <div className="forgot-password">
-            <p>Mot de passe oublié?</p>
-            </div>
+            <br/>
             <div className="login-button">
-                <button onClick={login}>Se connecter</button>
+                <button onClick={login}>Log In</button>
             </div>
             <div className="move-to-register">
-            <h5>Vous avez déja un compte ?</h5>
+            <h5>Already have an account?</h5>
               
-                    <button onClick={()=>navigate('/register')}>Inscriver-vous</button>
+                    <button onClick={()=>navigate('/register')}>Sign Up</button>
             
             </div>
         </div>

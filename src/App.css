@@ -153,6 +153,18 @@ padding-bottom: 10px;
   height: auto;
   position: relative;
 }
+
+/*.one-photo {
+  padding: 10px;
+  width: 100%;         
+  height: auto;         
+  max-height: 75%;       
+  object-fit: contain;   
+  display: block;       
+  margin: auto;          
+  position: relative;    
+}*/
+
 .media-container {
   position: relative;
   display: block;

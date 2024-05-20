@@ -6,6 +6,7 @@ import * as actionTypes from '../reducers/actionTypes'
 import {  useNavigate } from 'react-router-dom'
 import { connect, useDispatch, useSelector } from "react-redux";
 import { ToastContainer,toast } from "react-toastify";
+import inscription from "../assets/images/inscription.jpg"; 
 
 const Register = () => {
   const navigate=useNavigate()
@@ -23,17 +24,15 @@ const Register = () => {
   const register = async (e) => {
     e.preventDefault();
     if(password!=confirmPassword){
-      toast.error('Mot de passe non valid.');
+      toast.error('Invalid password.');
 
     }else{
 
     
     if(name.trim()==""||email.trim()==""||Tel.trim()==""||socite.trim()==""||password.trim()==""){
-      toast.error('verifier vos données .');
-
+      toast.error('Please verify your data.');
     }
     else{
-
 
     const formData = new FormData();
     formData.append("name", name);
@@ -71,7 +70,7 @@ const Register = () => {
           {/* -------------- image --------------------- */}
           <div className="register-img">
             <img
-              src="https://app.diggow.com/static/media/body_register.ef5486fd628fc4c8bc5c.png"
+              src={inscription}
               alt=""
             />
           </div>
@@ -86,14 +85,13 @@ const Register = () => {
                 <h3>diggow</h3>
               </div>
               <div className="register-welcome">
-                <h2>Bienvenue !</h2>
+                <h2>Welcome!</h2>
                 <p>
-                  Créez votre espace client et profitez de ses avantages pour
-                  gérer vos pages en toute simplicité !
+                Create your customer space and enjoy its benefits to manage your pages with ease!
                 </p>
               </div>
               <div className="register-input">
-                <label name="name">Nom</label>
+                <label name="name">Name</label>
                 <input
                   type="text"
                   onChange={(event) => setName(event.target.value)}
@@ -103,7 +101,7 @@ const Register = () => {
                 <label name="email">Email</label>
                 <input
                   type="email"
-                  placeholder="Nom@email.com"
+                  placeholder="Name@email.com"
                   onChange={(event) => setEmail(event.target.value)}
                 />
               </div>
@@ -117,14 +115,14 @@ const Register = () => {
                 <input type="number"    onChange={(event) => setTelephone(event.target.value)}  />
               </div>
               <div className="register-input">
-                <label name="password">Mot de passe</label>
+                <label name="password">Password</label>
                 <input
                   type="password"
                   onChange={(event) => setPassword(event.target.value)}
                 />
               </div>
               <div className="register-input">
-                <label name="confirm-password">Confirmer mot de passe</label>
+                <label name="confirm-password">Confirm Password</label>
                 <input type="password"        onChange={(event) => setConfirmPassword(event.target.value)}/>
               </div>
               <div className="password-exclamation">
@@ -140,15 +138,15 @@ const Register = () => {
                 </svg>
 
                 <p>
-                  Pour votre mot de passe , veuillez choisor au minimum 6 caratéres.
+                For your password, please choose at least 6 characters.
                 </p>
               </div>
               <div className="register-button">
-                <button onClick={register}>Se connecter</button>
+                <button onClick={register}>Sign In</button>
               </div>
               <div className="move-to-login">
-                <h5>Vous avez déja un compte ?</h5>
-                <Link to="/login">Connectez-vous</Link>
+                <h5>Already have an account?</h5>
+                <Link to="/login">Sign In</Link>
               </div>
             </div>
           </div>

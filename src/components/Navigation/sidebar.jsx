@@ -164,7 +164,7 @@ function Sidebar() {
                   <span className="icon-mini-menu ">A</span> */}
 
               <IoIosAddCircleOutline size={20} />
-              <span> Ajouter une page </span>
+              <span> Add a page </span>
             </a>
           </li>
           <li class="sidebar-item">
@@ -251,12 +251,7 @@ function Sidebar() {
             ></ul>
           </li>
         </ul>
-        <div class="sidebar-footer">
-          <a href="#" class="sidebar-link">
-            <i class="lni lni-exit"></i>
-            <span>Logout</span>
-          </a>
-        </div>
+        
         {showpopup && (
           <div className="popup">
             <div className="popup-content">
@@ -280,7 +275,7 @@ function Sidebar() {
                   />
                 </div>
                 <div className="ajouter-button">
-                  <button onClick={add}>Ajouter</button>
+                  <button onClick={add}>Add</button>
                 </div>
               </div>
             </div>

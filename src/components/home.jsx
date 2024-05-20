@@ -13,7 +13,7 @@ import { FaFacebookSquare } from "react-icons/fa";
 import { IoSaveOutline } from "react-icons/io5";
 import InputEmoji from "react-input-emoji";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
-import user from "../assets/images/Innovation page.png";
+import user from "../assets/images/diggow.jpg"; 
 import { CiHeart } from "react-icons/ci";
 import { GoComment } from "react-icons/go";
 import { RiShareForwardLine } from "react-icons/ri";
@@ -48,7 +48,8 @@ function Home() {
   const userData = useSelector((data) => data.user);
 
   const { eventdata } = useParams();
-  const data = eventdata ? JSON.parse(eventdata) : null;
+  const data = eventdata && eventdata !== "undefined" ? JSON.parse(eventdata) : null;
+
 
   const [loadingPublish, setLoadingPublish] = useState(false);
   const [loadingProgram, setLoadingProgram] = useState(false);
@@ -771,6 +772,9 @@ function Home() {
     }
   };
 
+
+  
+
   return (
     <div className="main">
       <Navbar home={true} />
@@ -805,7 +809,6 @@ function Home() {
                         onChange={handleinputchange}
                         height={150}
                         shouldReturnKey={true}
-                        maxLength={50}
                         placeholder="Add tags"
                       />
                       <div>
@@ -813,7 +816,7 @@ function Home() {
                           <div class="voice-button">
                             <button
                               id="recordButton"
-                              onclick="toggleRecording()"
+                              onClick={toggleRecording}  //onClick={toggleRecording}
                             >
                               {isActive ? (
                                 <FaRegStopCircle onClick={stopTranscription} />
@@ -920,9 +923,7 @@ function Home() {
                       </div>
                     </div>
                   )}
-                  <p className="description">
-                    Your text must not exceed 40 words
-                  </p>
+                
 
                   <div className="line"></div>
 
@@ -986,8 +987,7 @@ function Home() {
                   <div className="cadre">
                     <h6 className="title">Multimedia content</h6>
                     <p className="description">
-                      Share photos or video, Instagram posts cannot exceed 10
-                      photos
+                      Share photos or videos
                     </p>
                     <div className="d-flex ">
                       <label
@@ -1070,7 +1070,7 @@ function Home() {
                             onClick={updatepublish}
                           >
                             <FiSend className="mx-1" />
-                            Publier
+                            Publish
                           </button>
                         )}
                       </form>
@@ -1111,7 +1111,7 @@ function Home() {
                                 style={{ color: "#A020F0" }}
                                 className="mx-1"
                               />
-                              program
+                              Schedule
                             </button>
                           )}
                         </div>
@@ -1149,8 +1149,7 @@ function Home() {
                   <div className="cadre">
                     <h6 className="title">Multimedia content</h6>
                     <p className="description">
-                      Share photos or video, Instagram posts cannot exceed 10
-                      photos
+                      Share photos or videos
                     </p>
                     <div className="d-flex ">
                       <label
@@ -1233,7 +1232,7 @@ function Home() {
                             onClick={publishPost}
                           >
                             <FiSend className="mx-1" />
-                            Publier
+                            Publish
                           </button>
                         )}
                       </form>
@@ -1274,7 +1273,7 @@ function Home() {
                                 style={{ color: "#A020F0" }}
                                 className="mx-1"
                               />
-                              program
+                              Schedule
                             </button>
                           )}
                         </div>
@@ -1312,8 +1311,7 @@ function Home() {
                   <div className="cadre">
                     <h6 className="title">Multimedia content</h6>
                     <p className="description">
-                      Share photos or video, Instagram posts cannot exceed 10
-                      photos
+                      Share photos or videos
                     </p>
                     <div className="d-flex icons disabled ">
                       <label
@@ -1396,7 +1394,7 @@ function Home() {
                             onClick={publishPost}
                           >
                             <FiSend className="mx-1" />
-                            Publier
+                            Publish
                           </button>
                         )}
                       </form>
@@ -1437,7 +1435,7 @@ function Home() {
                                 style={{ color: "#A020F0" }}
                                 className="mx-1"
                               />
-                              program
+                              Schedule
                             </button>
                           )}
                         </div>
@@ -1513,7 +1511,7 @@ function Home() {
                       </div>
                       <div className="ms-2">
                         <h6 className="name-user">{selectedValueName}</h6>
-                        <span className="online-time">A l'instant</span>
+                        <span className="online-time">Just now</span>
                       </div>
                     </div>
                     <div>

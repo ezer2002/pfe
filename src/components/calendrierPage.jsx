@@ -113,7 +113,7 @@ export default function Calenderpage() {
     // new Date(Y, M, D, H, MIN)
     return {
       title: "Innovation page",
-      start: new Date(event.start),// si shadul m3bya t7ot l valeur mt3 shadel si  non t7ot l valeur mta3 created at 
+      start: new Date(event.start),//  
       end: new Date(event.end),
       color: event.color,
       subtitle: event.subtitle, // Ajoutez la propriété de sous-titre à chaque événement
@@ -136,7 +136,7 @@ export default function Calenderpage() {
   const [showMorePopup, setShowMorePopup] = useState(false);
   const [moreEvents, setMoreEvents] = useState([]);
   useEffect(() => {
-    // sal();
+  
 
     document.addEventListener("click", handleOutsideClick);
     return () => {
