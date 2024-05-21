@@ -41,6 +41,8 @@ import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import Navbar from "./Navigation/navbar";
 
+
+
 function Home() {
   const location = useLocation();
   const params = new URLSearchParams(window.location.search);
@@ -48,8 +50,7 @@ function Home() {
   const userData = useSelector((data) => data.user);
 
   const { eventdata } = useParams();
-  const data = eventdata && eventdata !== "undefined" ? JSON.parse(eventdata) : null;
-
+  const data = eventdata ? JSON.parse(eventdata) : null;
 
   const [loadingPublish, setLoadingPublish] = useState(false);
   const [loadingProgram, setLoadingProgram] = useState(false);
@@ -91,19 +92,21 @@ function Home() {
   const [isActive, setIsActive] = useState(false);
   const [counter, setCounter] = useState(0);
 
+  const recognitionRef = useRef(null);
+
+  if (!recognitionRef.current && typeof window.webkitSpeechRecognition !== "undefined") {
+    recognitionRef.current = new window.webkitSpeechRecognition();
+    recognitionRef.current.interimResults = true;
+    recognitionRef.current.continuous = true;
+  }
+
   useEffect(() => {
     if (data && data.media_path) {
-      if( data.media_path!='null'){
-        console.log("the media pathh",data.media_path)
-        if (data.media_path.endsWith("mp4")) {
-          setVideoFile(`http://127.0.0.1:8000/${data.media_path}`);
-        } else {
-          setImageLocale(`http://127.0.0.1:8000/${data.media_path}`);
-          setImage(`${data.media_path}`);
-  
-        }
+      if (data.media_path.endsWith("mp4")) {
+        setVideoFile(`http://127.0.0.1:8000/${data.media_path}`);
+      } else {
+        setImageLocale(`http://127.0.0.1:8000/${data.media_path}`);
       }
-     
     }
 
     // console.log("hello",data.media_paths)
@@ -189,7 +192,7 @@ function Home() {
     startRecording,
     stopRecording,
     pauseRecording,
- 
+    mediaBlobUrl,
   } = useReactMediaRecorder({
     video: false,
     audio: true,
@@ -257,10 +260,9 @@ function Home() {
     const formData = new FormData();
     formData.append("message", text);
 
+    console.log(videoFile);
 
-
-    console.log('from function',image);
- 
+    console.log(image);
     formData.append("media_path", image ? image : videoFile);
     formData.append("idpage", selectedValue);
     formData.append("id", data.id);
@@ -505,15 +507,12 @@ function Home() {
   };
 
   const handleDeleteMedia = (index) => {
-console.log(index)
-
     const updatedFiles = [...selectedFiles];
     //const updatedFiles = selectedFiles.filter((_, i) => i !== index);
     updatedFiles.splice(index, 1);
     setselectedFiles(updatedFiles);
     setVideoFile(null);
     setImage(null);
-
     setImageLocale(null);
 
     // Si vous êtes en train de supprimer une image
@@ -547,7 +546,6 @@ console.log(index)
     const col1 = selectedFiles.slice(0, 2);
     const col2 = selectedFiles.slice(2, 5);
     setColumns([col1, col2]);
-
   }, [selectedFiles]);
 
   const deletepost = async () => {
@@ -718,30 +716,59 @@ console.log(index)
     }
   };
 
-  const toggleRecording = () => {
-    if (!isActive) {
-      startRecording();
-    } else {
-      pauseRecording();
-    }
-    setIsActive(!isActive);
-  };
+  useEffect(() => {
+    return () => {
+      stopRecording(); // Arrête l'enregistrement si encore en cours
+    };
+  }, [stopRecording]);
 
-  const recognition = new window.webkitSpeechRecognition();
-  recognition.interimResults = true;
-  recognition.continuous = true;
+  useEffect(() => {
+    const recognition = recognitionRef.current;
+  
+    const handleResult = (event) => {
+      let transcript = "";
+      for (const result of event.results) {
+        transcript += result[0].transcript;
+      }
+      setText(transcript);
+    };
+  
+    const handleError = (event) => {
+      console.error("Voice recognition error: ", event.error);
+    };
+  
+    const handleEnd = () => {
+      if (isRecording) {
+        recognition.start();
+      }
+    };
+  
+    recognition.addEventListener('result', handleResult);
+    recognition.addEventListener('error', handleError);
+    recognition.addEventListener('end', handleEnd);
+  
+    // Maintenant, passons les fonctions spécifiques lors de la suppression
+    return () => {
+      recognition.removeEventListener('result', handleResult);
+      recognition.removeEventListener('error', handleError);
+      recognition.removeEventListener('end', handleEnd);
+    };
+  }, []);
+
+  const toggleRecording = () => {
+  if (isRecording) {
+    stopTranscription();
+  } else {
+    handleVoiceToText();
+  }
+};
+
+  
 
   const handleVoiceToText = () => {
-    // If already recording, reset everything and stop the current recording
     if (isRecording) {
-      recognition.stop();
-      setIsRecording(false);
-      stopRecording();
-      setIsActive(false);
-      stopTimer();
-      setText("");
+      stopTranscription();
     } else {
-      // Reset states before starting a new session
       setText("");
       setSecond("00");
       setMinute("00");
@@ -749,37 +776,17 @@ console.log(index)
       setIsActive(true);
       startRecording();
       setIsRecording(true);
-      recognition.start();
+      recognitionRef.current.start();
     }
-
-    recognition.onresult = (e) => {
-      let transcript = "";
-      for (const result of e.results) {
-        transcript += result[0].transcript;
-      }
-      setText(transcript);
-    };
-
-    recognition.onerror = (event) => {
-      console.error("Voice recognition error: ", event.error);
-    };
-
-    recognition.onend = () => {
-      // Automatically restart recognition unless it has been explicitly stopped
-      if (isRecording) {
-        recognition.start();
-      }
-    };
   };
-
+  
   const stopTranscription = () => {
     if (isRecording) {
-      recognition.stop(); // Arrêter la reconnaissance vocale
-      recognition.onresult = null; // Retirer le gestionnaire de résultat pour arrêter l'écriture dans setText
-      stopRecording(); // S'assurer que l'enregistrement audio est également arrêté
-      setIsRecording(false); // Mettre à jour l'état pour refléter que l'enregistrement est terminé
-      setIsActive(false); // Désactiver l'état actif
-      stopTimer(); // Arrêter le compteur
+      recognitionRef.current.stop();
+      stopRecording();
+      setIsRecording(false);
+      setIsActive(false);
+      stopTimer();
     }
   };
 
@@ -825,16 +832,13 @@ console.log(index)
                       <div>
                         <div class="voice-control">
                           <div class="voice-button">
-                            <button
-                              id="recordButton"
-                              onClick={toggleRecording}  //onClick={toggleRecording}
-                            >
-                              {isActive ? (
-                                <FaRegStopCircle onClick={stopTranscription} />
-                              ) : (
-                                <AiTwotoneAudio onClick={handleVoiceToText} />
-                              )}
-                            </button>
+                          <button id="recordButton" onClick={toggleRecording}>
+                            {isActive ? (
+                              <FaRegStopCircle />
+                            ) : (
+                              <AiTwotoneAudio />
+                            )}
+                          </button>
                           </div>
 
                           <div class="timer">
@@ -846,42 +850,29 @@ console.log(index)
                       </div>
                     </div>
                   )}
+
                   {data && data.subtitle == "saved as draft" && (
                     <div className="d-flex ">
-                      <InputEmoji
+                    <InputEmoji
                         value={text}
                         onChange={handleinputchange}
                         height={150}
                         shouldReturnKey={true}
-                        maxLength={50}
                         placeholder="Add tags"
                       />
                       <div>
-                        <div>
-                          <div
-                            style={{
-                              display: "flex",
-                              paddingTop: "15px",
-                            }}
-                          >
-                            <button
-                              style={{
-                                border: "none",
-                                fontSize: "1.3rem",
-                                cursor: "pointer",
-                                color: "black",
-                              }}
-                              onClick={toggleRecording}
-                            >
-                              {isActive ? (
-                                <FaRegStopCircle onClick={stopTranscription} />
-                              ) : (
-                                <AiTwotoneAudio onClick={handleVoiceToText} />
-                              )}
-                            </button>
+                        <div class="voice-control">
+                          <div class="voice-button">
+                          <button id="recordButton" onClick={toggleRecording}>
+                            {isActive ? (
+                              <FaRegStopCircle />
+                            ) : (
+                              <AiTwotoneAudio />
+                            )}
+                          </button>
                           </div>
 
-                          <div style={{ fontSize: "14px" }}>
+                          <div class="timer">
                             <span className="minute">{minute}</span>
                             <span>:</span>
                             <span className="second">{second}</span>
@@ -892,40 +883,26 @@ console.log(index)
                   )}
                   {data && data.subtitle != "saved as draft" && (
                     <div className="d-flex icons disabled ">
-                      <InputEmoji
+                    <InputEmoji
                         value={text}
                         onChange={handleinputchange}
                         height={150}
                         shouldReturnKey={true}
-                        
                         placeholder="Add tags"
                       />
                       <div>
-                        <div>
-                          <div
-                            style={{
-                              display: "flex",
-                              paddingTop: "15px",
-                            }}
-                          >
-                            <button
-                              style={{
-                                border: "none",
-                                fontSize: "1.3rem",
-                                cursor: "pointer",
-                                color: "black",
-                              }}
-                              onClick={toggleRecording}
-                            >
-                              {isActive ? (
-                                <FaRegStopCircle onClick={stopTranscription} />
-                              ) : (
-                                <AiTwotoneAudio onClick={handleVoiceToText} />
-                              )}
-                            </button>
+                        <div class="voice-control">
+                          <div class="voice-button">
+                          <button id="recordButton" onClick={toggleRecording}>
+                            {isActive ? (
+                              <FaRegStopCircle />
+                            ) : (
+                              <AiTwotoneAudio />
+                            )}
+                          </button>
                           </div>
 
-                          <div style={{ fontSize: "14px" }}>
+                          <div class="timer">
                             <span className="minute">{minute}</span>
                             <span>:</span>
                             <span className="second">{second}</span>
