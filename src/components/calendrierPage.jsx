@@ -86,9 +86,10 @@ export default function Calenderpage() {
   const userData = useSelector((data) => data.user);
 
 
-  const toggleEventPopup = () => {
+  /*const toggleEventPopup = () => {
     setshoweventpopup(!showeventpopup);
-  };
+  };*/
+  
   const togglePopup = () => {
     setshowpopup(!showpopup);
   };
@@ -184,55 +185,14 @@ const [deletedpost, setdeletedpost] = useState("");
       );
       setIsModalOpen(false)
       toast.success("Post deleted successfully.");
-      navigate("/calendar");
+      //navigate("/calendar");
     } catch (err) {
       toast.success("An error occurred.");
       console.log(err);
     }
   };
 
-  const CustomDateCellWrapper = ({ children, value, events }) => {
-    const [showAllEvents, setShowAllEvents] = useState(false);
-
-    const toggleShowAllEvents = () => {
-      setShowAllEvents(!showAllEvents);
-    };
-
-    return (
-      <div style={{ position: "relative" }}>
-        {children}
-        {showAllEvents ? (
-          <div>
-            {events.map((event) => (
-              <div key={event.id}>{event.title 
-              } </div>
-              
-            ))}
-            <button onClick={toggleShowAllEvents}>Moins</button>
-          </div>
-        ) : (
-          events.length > 1 && (
-            <div
-              style={{
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
-                color: "white",
-                padding: "2px 4px",
-                borderRadius: "2px",
-                fontSize: "12px",
-                cursor: "pointer",
-              }}
-              onClick={toggleShowAllEvents}
-            >
-              More
-            </div>
-          )
-        )}
-      </div>
-    );
-  };
+  
   const [selectedDateEvents, setSelectedDateEvents] = useState([]);
 
   const handleSelectSlot = (slotInfo) => {

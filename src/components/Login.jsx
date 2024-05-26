@@ -3,7 +3,7 @@ import '../styles/login.css'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { connect, useDispatch, useSelector } from "react-redux";
-import * as actionTypes from '../reducers/actionTypes'
+import * as actionTypes from '../reducers/actionTypes';
 import { ToastContainer,toast } from "react-toastify";
 import connexion from "../assets/images/connexion.jpg";  
 
@@ -103,3 +103,9 @@ const Login = () => {
 }
 
 export default Login
+
+
+
+
+
+

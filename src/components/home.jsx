@@ -99,23 +99,36 @@ function Home() {
     recognitionRef.current.interimResults = true;
     recognitionRef.current.continuous = true;
   }
+  let [cleanedFilePathsArray, setcleanedFilePathsArray] = useState([]);
 
   useEffect(() => {
     if (data && data.media_path) {
-      if (data.media_path.endsWith("mp4")) {
-        setVideoFile(`http://127.0.0.1:8000/${data.media_path}`);
-      } else {
-        setImageLocale(`http://127.0.0.1:8000/${data.media_path}`);
+      if( data.media_path!='null'){
+        console.log("the media path",data.media_path)
+        if (data.media_path.endsWith("mp4")) {
+          setVideoFile(data.media_path);
+        } else {
+          if(data.media_path.includes('uploads/')){
+            setImageLocale(`http://127.0.0.1:8000/${data.media_path}`);
+
+          }else{
+            setImageLocale(data.media_path);
+
+          }
+        
+          setImage(`${data.media_path}`);
+  
+        }
       }
+     
     }
 
     // console.log("hello",data.media_paths)
     if (data && data.media_paths) {
       const filePathsArray = JSON.parse(data.media_paths);
-      const cleanedFilePathsArray = filePathsArray.map((path) =>
+       cleanedFilePathsArray = filePathsArray.map((path) =>
         path.replace(/\\/g, "")
       );
-      console.log("hello",cleanedFilePathsArray)
       const col1 = cleanedFilePathsArray.slice(0, 2);
       const col2 = cleanedFilePathsArray.slice(2, 5);
       setcolumsdata([col1, col2]);
@@ -145,8 +158,7 @@ function Home() {
       }
 
       // setPages(response.data);
-      console.log("page", response.data);
-      console.log("pag2e", pages);
+    
     } catch (err) {
       console.log("err");
     }
@@ -192,7 +204,7 @@ function Home() {
     startRecording,
     stopRecording,
     pauseRecording,
-    mediaBlobUrl,
+    //mediaBlobUrl,
   } = useReactMediaRecorder({
     video: false,
     audio: true,
@@ -214,7 +226,7 @@ function Home() {
 
   const handleFilesChange = (event) => {
     const files = event.target.files;
-
+  
     // Vérifier si des fichiers ont été sélectionnés
     if (files.length === 0) {
       return;
@@ -228,7 +240,7 @@ function Home() {
       toast.error("Please choose an image or a video.");
       return;
     }
-
+   
     // Si c'est une image
     if (isImage) {
       setImage(null);
@@ -260,9 +272,9 @@ function Home() {
     const formData = new FormData();
     formData.append("message", text);
 
-    console.log(videoFile);
+    //console.log(videoFile);
 
-    console.log(image);
+    console.log('from function',image);
     formData.append("media_path", image ? image : videoFile);
     formData.append("idpage", selectedValue);
     formData.append("id", data.id);
@@ -273,10 +285,24 @@ function Home() {
     if (videoFile) {
         formData.append("media_path", videoFile, videoFile.name);
     }*/
-
-    selectedFiles.forEach((media, index) => {
-      formData.append(`media_paths[${index}]`, media.file);
-    });
+    
+    let newdata=columsdata.flat()
+ console.log(newdata)
+    if(newdata.length>0  ){
+      console.log('helooool',newdata)
+      newdata.forEach((media, index) => {
+        
+        formData.append(`media_pathsdelete[${index}]`, media);
+      });
+    }
+  else{
+  
+  
+  }
+  selectedFiles.forEach((media, index) => {
+    formData.append(`media_paths[${index}]`, media.file);
+  });
+    console.log("the form",cleanedFilePathsArray)
     /*selectedFiles.forEach((file, index) => {
       formData.append(`media_paths[${index}]`, file, file.name);
     });
@@ -300,7 +326,7 @@ function Home() {
         }
       );
       toast.success("Post modified successfully.");
-
+        console.log(response)
       navigate("/calendar");
       setColumns([]);
     } catch (err) {
@@ -426,8 +452,9 @@ function Home() {
           },
         }
       );
+      console.log(response)
       setLoadingPublish(false);
-      navigate("/calendar");
+      // navigate("/calendar");
       toast.success("Post published successfully.");
 
       setColumns([]);
@@ -437,9 +464,11 @@ function Home() {
       console.log(err);
     }
   };
+  
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
+
   const navigate = useNavigate();
 
   const handleCloseModal = () => {
@@ -505,23 +534,45 @@ function Home() {
     setVideoFile("");
     setImageLocale("");
   };
+  const [selectedfilesdata, setselectedfilesdata] = useState([]);
 
-  const handleDeleteMedia = (index) => {
+  const handleDeleteMedia = (colIndex, mediaIndex) => {
+    const globalIndex = colIndex * columns[0].length + mediaIndex;
+    const globalIndextow = colIndex * columsdata[0].length + mediaIndex;
+    const updatedFilestow =columsdata.flat();
+
     const updatedFiles = [...selectedFiles];
-    //const updatedFiles = selectedFiles.filter((_, i) => i !== index);
-    updatedFiles.splice(index, 1);
-    setselectedFiles(updatedFiles);
+    if (globalIndex >= 0 && globalIndex < updatedFiles.length) {
+        updatedFiles.splice(globalIndex, 1);
+        setselectedFiles(updatedFiles);
+       
+        console.log("her",columsdata)
+
+    } else {
+        console.warn(`Index ${globalIndex} out of bounds for selectedFiles`);
+    }
+    if (globalIndextow >= 0 && globalIndextow <= updatedFilestow.length) {
+      
+      updatedFilestow.splice(globalIndextow, 1);
+      setcleanedFilePathsArray(updatedFilestow);
+   
+
+  } else {
+      console.warn(`Index ${globalIndex} out of bounds for selectedFiles`);
+  }
+    
     setVideoFile(null);
     setImage(null);
     setImageLocale(null);
-
+    
     // Si vous êtes en train de supprimer une image
     if (imageInputRef.current) imageInputRef.current.value = "";
     // Si vous êtes en train de supprimer un album
     if (imagesInputRef.current) imagesInputRef.current.value = "";
     // Si vous êtes en train de supprimer une vidéo
     if (videoInputRef.current) videoInputRef.current.value = "";
-  };
+};
+
 
   const getMediaClass = (index, filesCount) => {
     if (filesCount >= 6 && index === 4) return "with-overlay";
@@ -541,11 +592,19 @@ function Home() {
   const VoirCalendrier = () => {
     setprogram(true);
   };
-
+  
+  
+  useEffect(() => {
+    const col1 = cleanedFilePathsArray.slice(0, 2);
+    const col2 = cleanedFilePathsArray.slice(2, 5);
+    setcolumsdata([col1, col2]);
+  
+  }, [cleanedFilePathsArray]);
   useEffect(() => {
     const col1 = selectedFiles.slice(0, 2);
     const col2 = selectedFiles.slice(2, 5);
     setColumns([col1, col2]);
+  
   }, [selectedFiles]);
 
   const deletepost = async () => {
@@ -674,9 +733,17 @@ function Home() {
 
     const formData = new FormData();
     formData.append("message", text);
-    formData.append("media_path", image ?? videoFile);
-    //formData.append("idpage", selectedValue);
+    console.log(image);
+    if(image){
+      formData.append("media_path", image );
 
+    }if(videoFile){
+      formData.append("media_path", videoFile );
+
+    }
+
+    //formData.append("idpage", selectedValue);
+   
     selectedFiles.forEach((media, index) => {
       formData.append(`media_paths[${index}]`, media.file);
     });
@@ -803,11 +870,20 @@ function Home() {
               <div className="cadre">
                 <h6 className="title">Post in</h6>
                 <div>
+                {data && data.subtitle != "saved as draft"  && 
                   <Select
+                  isDisabled
                     className="select-option  "
                     options={pages}
                     onChange={handleDropdownChange}
-                  />
+                  />}
+                    {!data || data && data.subtitle == "saved as draft"  && 
+                  <Select
+                 
+                    className="select-option  "
+                    options={pages}
+                    onChange={handleDropdownChange}
+                  />}
                 </div>
               </div>
             </div>
@@ -1511,7 +1587,8 @@ function Home() {
                               <source
                                 src={
                                   data
-                                    ? videoFile
+                                        ? `http://127.0.0.1:8000/${videoFile}` 
+
                                     : URL.createObjectURL(videoFile)
                                 }
                                 type={videoFile.type}
@@ -1520,7 +1597,7 @@ function Home() {
                             </video>
                             <button
                               className="delete-overlay"
-                              onClick={() => handleDeleteMedia()}
+                              onClick={() => handleDeleteMedia(0)}
                             >
                               X
                             </button>
@@ -1531,103 +1608,71 @@ function Home() {
                             <img src={imagelocale} className="one-photo" />
                             <button
                               className="delete-overlay"
-                              onClick={() => handleDeleteMedia()}
+                              onClick={() => handleDeleteMedia(0)}
                             >
-                              X
+
+                              X 
                             </button>
                           </div>
                         )}
                         
                         {
-                          data &&      <div className=" media-container album">
-                          <Grid container>
-                            {columsdata.map((column, index) => (
-                              <Grid item xs={6} key={index}>
-                                {column.map((media, indexmedia) => (
-                                  <div
-                                    key={index}
-                                    className={`media-container ${getMediaClass(
-                                      index,
-                                      selectedFiles.length
-                                    )}`}
-                                  >
-                                    <button
-                                      className="delete-album"
-                                      onClick={() => handleDeleteMedia(index)}
-                                    >
-                                      X
-                                    </button>
-                                    <div
-                                      className={index == 1 ? "trois" : "tow"}
-                                    >
-                                       <img
-                                          src={`http://127.0.0.1:8000/${media}`}
-                                          alt={media.name}
-                                          key={media.id}
-                                          className={
-                                            indexmedia == 2
-                                              ? "album collectmedia"
-                                              : "album"
-                                          }
-                                        /> 
-                                       {media.endsWith("mp4")&&
-                                       
-                                       <div className="media-container">
-                            <video width="100%" height="auto" controls>
-                              <source
-                                src={
-                                  `http://127.0.0.1:8000/${media}`
-                                }
-                              
-                              />
-                              Your browser does not support the video tag.
-                            </video>
-                           
-                          </div>
-                                       }
-       
-                                      {/* {media.type.startsWith("image/") && (
-                                        <img
-                                          src={URL.createObjectURL(media.file)}
-                                          alt={media.name}
-                                          key={media.id}
-                                          className={
-                                            indexmedia == 2
-                                              ? "album collectmedia"
-                                              : "album"
-                                          }
-                                        />
-                                      )}
+                          data &&      
+                          <div className="media-container album">
+                            <Grid container>
+                                {columsdata.map((column, index) => (
+                                    <Grid item xs={6} key={index}>
+                                        {column.map((media, indexmedia) => (
+                                            <div
+                                                key={indexmedia}
+                                                className={`media-container ${getMediaClass(
+                                                    index,
+                                                    selectedFiles.length
+                                                )}`}
+                                            >
+                                                <button
+                                                    className="delete-album"
+                                                    onClick={() => handleDeleteMedia(index, indexmedia)}
+                                                >
+                                                    X
+                                                </button>
+                                                <div className={index === 1 ? "trois" : "tow"}>
+                                                    {media.endsWith(".mp4") ? (
+                                                        <div className="media-container">
+                                                            <video width="100%" height="auto" controls>
+                                                                <source
+                                                                    src={`http://127.0.0.1:8000/${media}`}
+                                                                />
+                                                                Your browser does not support the video tag.
+                                                            </video>
+                                                        </div>
+                                                    ) : (
+                                                        <img
+                                                            src={`http://127.0.0.1:8000/${media}`}
+                                                            alt={media}
+                                                            className={
+                                                              indexmedia === 2
+                                                                    ? "album collectmedia"
+                                                                    : "album"
+                                                            }
+                                                        />
+                                                    )}
+                                                </div>
 
-                                      {media.file.type.startsWith("video/") && (
-                                        <video
-                                          controls
-                                          src={URL.createObjectURL(media.file)}
-                                          alt={media.name}
-                                          key={media.id}
-                                          className={
-                                            indexmedia == 2
-                                              ? "album collectmedia"
-                                              : "album"
-                                          }
-                                        />
-                                      )} */}
-                                    </div>
-
-                                    <span
-                                      className={
-                                        indexmedia == 2 ? " play" : "numbers"
-                                      }
-                                    >
-                                      {" "}
-                                      {selectedFiles.length - 4}+{" "}
-                                    </span>
-                                  </div>
+                                                <span
+                                                    className={
+                                                      indexmedia === 2 ? "play" : "numbers"
+                                                    }
+                                                >
+                                                    {" "}
+                                                    {selectedFiles.length - 4}+{" "}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </Grid>
                                 ))}
-                              </Grid>
-                            ))}
-                          </Grid>
-                        </div>
+                            </Grid>
+        </div>
                         }
                         <div className=" media-container album">
                           <Grid container>
@@ -1635,7 +1680,7 @@ function Home() {
                               <Grid item xs={6} key={index}>
                                 {column.map((media, indexmedia) => (
                                   <div
-                                    key={index}
+                                    key={indexmedia}
                                     className={`media-container ${getMediaClass(
                                       index,
                                       selectedFiles.length
@@ -1643,7 +1688,7 @@ function Home() {
                                   >
                                     <button
                                       className="delete-album"
-                                      onClick={() => handleDeleteMedia(index)}
+                                      onClick={() => handleDeleteMedia(index, indexmedia)}
                                     >
                                       X
                                     </button>

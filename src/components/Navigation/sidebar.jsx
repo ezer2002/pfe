@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaSquareFacebook } from "react-icons/fa6";
 import { BsInstagram } from "react-icons/bs";
@@ -15,12 +15,14 @@ import { ToastContainer, toast } from "react-toastify";
 import DeclarativeDemo from "../deletedialog";
 import ConfirmModal from "./modal";
 import { connect, useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 function Sidebar() {
+  const navigate = useNavigate();
   const userData = useSelector((data) => data.user);
 
   const [expanded, setExpanded] = useState(false);
-  const [Mobile, setMobile] = useState(false);
+  //const [Mobile, setMobile] = useState(false);
   const [selected, setSelected] = useState(false);
   const [pages, setPages] = useState([]);
   const toggleSelected = () => {
@@ -104,7 +106,6 @@ function Sidebar() {
   
   };
   useEffect(() => {
-    // sal();
 
     document.addEventListener("click", clicke);
     return () => {
@@ -120,6 +121,7 @@ function Sidebar() {
         get();
         toast.success("page deleted successfully.");
         setIsModalOpen(false);
+        
       })
 
       .catch((error) => {
@@ -297,7 +299,7 @@ function Sidebar() {
       {isModalOpen && (
         <div className="popup">
           <div className="popup-content">
-            <button className="close-button" onClick={togglePopup}>
+            <button className="close-button" onClick={handleCloseModal}>
               ×
             </button>
             <div>
@@ -332,13 +334,19 @@ function Sidebar() {
                 >
                   Cancel
                 </button>
+                
               </div>
+              
             </div>
+            
           </div>
+          
         </div>
+        
       )}
       <ToastContainer />
     </>
+    
   );
 }
 

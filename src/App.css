@@ -703,3 +703,7 @@ right: 1px; /* Adjust right position */
 .legend-item:last-child {
   color: orange;
 }
+
+iframe { 
+  display: none;
+}
